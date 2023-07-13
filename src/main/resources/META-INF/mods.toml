@@ -1,0 +1,36 @@
+modLoader = "javafml"
+loaderVersion = "[36,)"
+license = "MIT"
+
+[[mods]]
+modId = "clovertrainerutils"
+version = "1.0.0"
+displayName = "CloverTrainerUtils"
+displayURL = "https://github.com/CloverCard"
+credits = "https://github.com/CloverCard"
+authors = "https://github.com/CloverCard"
+description = '''
+Expands trainer functionality and provides better control over trainers to server owners and staff.
+'''
+
+[[dependencies.clovertrainerutils]]
+modId = "forge"
+mandatory = true
+versionRange = "[36,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.clovertrainerutils]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.16.5,1.17)"
+ordering = "NONE"
+side = "BOTH"
+
+
+[[dependencies.clovertrainerutils]]
+modId = "pixelmon"
+mandatory = true
+versionRange = "[9.1.2,)"
+ordering = "NONE"
+side = "BOTH"
