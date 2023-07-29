@@ -16,6 +16,7 @@ import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import com.pixelmonmod.pixelmon.api.util.helpers.ResourceLocationHelper;
 import com.pixelmonmod.pixelmon.battles.BattleRegistry;
 import com.pixelmonmod.pixelmon.battles.attacks.Attack;
+import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipant;
 import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
 import com.pixelmonmod.pixelmon.battles.controller.participants.TrainerParticipant;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
@@ -99,7 +100,7 @@ public class ShufflerHelper {
         //Register NPC and player for battle
         PlayerParticipant pp = new PlayerParticipant(player, StorageProxy.getParty(player).getSelectedPokemon());
         TrainerParticipant tp = new TrainerParticipant(trainer, player, 1);
-        BattleRegistry.startBattle(pp, tp);
+        BattleRegistry.startBattle(new BattleParticipant[] {pp}, new BattleParticipant[] {tp}, trainer.battleRules);
     }
 
     public static String addShuffleTeam(NPCTrainer trainer, String ... args) {
