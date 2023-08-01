@@ -80,6 +80,7 @@ public class BattleListeners {
             assert player != null;
             event.setCanceled(true);
             NPCTrainer temp = new NPCTrainer(trainer.level);
+            temp.setPersistenceRequired();
             temp.setPos(player.getX(), player.getY(), player.getZ());
             if(trainer.getWinnings() != null) temp.updateDrops(trainer.getWinnings());
             if(trainer.battleRules != null) temp.battleRules = trainer.battleRules;
