@@ -23,6 +23,7 @@ import com.pixelmonmod.pixelmon.battles.controller.participants.TrainerParticipa
 import com.pixelmonmod.pixelmon.battles.controller.participants.WildPixelmonParticipant;
 import com.pixelmonmod.pixelmon.comm.SetTrainerData;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
+import com.pixelmonmod.pixelmon.enums.EnumEncounterMode;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Util;
@@ -56,6 +57,15 @@ public class BattleListeners {
             }
         }
         if (!trainerExists) return;
+        if (player == null) return;
+
+        //Handle encounter limits
+        EnumEncounterMode encounterMode = trainer.getEncounterMode();
+        if (encounterMode == EnumEncounterMode.OncePerMCDay) {
+            trainer.playerEncounters.put(player.getUUID(), player.getLevel().getGameTime());
+        } else if (encounterMode == EnumEncounterMode.OncePerDay) {
+            trainer.playerEncounters.put(player.getUUID(), System.currentTimeMillis());
+        }
 
         //Check if Data needed for sidemod is present
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
@@ -64,7 +74,6 @@ public class BattleListeners {
         //Handle Checkpoints
         if (CheckpointsHelper.hasCheckpointTag(trainer)) {
             if (!CheckpointsHelper.playerHasAccess(player, trainer)) {
-                assert player != null;
                 player.sendMessage(new StringTextComponent("You do not have access to this trainer fight!"), Util.NIL_UUID);
                 event.setCanceled(true);
                 return;
@@ -77,7 +86,6 @@ public class BattleListeners {
         }
         else {
             //Create Clone Trainer
-            assert player != null;
             event.setCanceled(true);
             NPCTrainer temp = new NPCTrainer(trainer.level);
             temp.setPersistenceRequired();
