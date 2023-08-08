@@ -9,9 +9,9 @@ import com.clovercard.clovertrainerutils.helpers.battle.BattleCommandsHelper;
 import com.clovercard.clovertrainerutils.helpers.battle.BattleRewardsHelper;
 import com.clovercard.clovertrainerutils.helpers.checkpoints.CheckpointsHelper;
 import com.clovercard.clovertrainerutils.helpers.shuffler.ShufflerHelper;
-import com.pixelmonmod.pixelmon.api.events.BattleStartedEvent;
 import com.pixelmonmod.pixelmon.api.events.BeatTrainerEvent;
 import com.pixelmonmod.pixelmon.api.events.LostToTrainerEvent;
+import com.pixelmonmod.pixelmon.api.events.battles.BattleStartedEvent;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.boss.BossTierRegistry;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
@@ -35,12 +35,12 @@ import java.util.ArrayList;
 public class BattleListeners {
     @SubscribeEvent
     public void onBattleStarted(BattleStartedEvent event) {
-        if (event.bc.containsParticipantType(WildPixelmonParticipant.class)) return;
+        if (event.getBattleController().containsParticipantType(WildPixelmonParticipant.class)) return;
         //Get Player and Trainer if they exist
         ServerPlayerEntity player = null;
         NPCTrainer trainer = null;
         boolean trainerExists = false;
-        for (BattleParticipant participant : event.participant1) {
+        for (BattleParticipant participant : event.getTeamOne()) {
             if (participant instanceof PlayerParticipant) {
                 player = ((PlayerParticipant) participant).player;
             } else if (participant instanceof TrainerParticipant) {
@@ -48,7 +48,7 @@ public class BattleListeners {
                 trainer = ((TrainerParticipant) participant).trainer;
             }
         }
-        for (BattleParticipant participant : event.participant2) {
+        for (BattleParticipant participant : event.getTeamTwo()) {
             if (participant instanceof PlayerParticipant) {
                 player = ((PlayerParticipant) participant).player;
             } else if (participant instanceof TrainerParticipant) {
