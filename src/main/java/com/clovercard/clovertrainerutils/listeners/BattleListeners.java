@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
 public class BattleListeners {
     @SubscribeEvent
-    public void onBattleStarted(BattleStartedEvent event) {
+    public void onBattleStarted(BattleStartedEvent.Pre event) {
         if (event.getBattleController().containsParticipantType(WildPixelmonParticipant.class)) return;
         //Get Player and Trainer if they exist
         ServerPlayerEntity player = null;
