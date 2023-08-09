@@ -2,10 +2,9 @@ package com.clovercard.clovertrainerutils.helpers.battle;
 
 import com.clovercard.clovertrainerutils.enums.TrainerUtilsTags;
 import com.clovercard.clovertrainerutils.enums.battle.BattleCommandsTypes;
-import com.clovercard.clovertrainerutils.enums.battle.BattleRewardTags;
 import com.clovercard.clovertrainerutils.listeners.BattleCommandsTickQueue;
 import com.clovercard.clovertrainerutils.objects.requests.BattleCommand;
-import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
+import com.pixelmonmod.pixelmon.entities.npcs.NPCEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -14,12 +13,11 @@ import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Util;
 import net.minecraftforge.common.util.Constants;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class BattleCommandsHelper {
     //Puts BattleCommands into the BattleCommandsTickQueue
-    public static void enqueueCommands(String tagId, ServerPlayerEntity player, NPCTrainer trainer) {
+    public static void enqueueCommands(String tagId, ServerPlayerEntity player, NPCEntity trainer) {
         //Get the main tag nbt
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
         CompoundNBT main = (CompoundNBT) trainer.getPersistentData().get(TrainerUtilsTags.MAIN_TAG.getId());
@@ -67,7 +65,7 @@ public class BattleCommandsHelper {
         }
     }
 
-    public static String addStartCommand(NPCTrainer trainer, String... args) {
+    public static String addStartCommand(NPCEntity trainer, String... args) {
         //Stores a command in a ListNBT to be run when a battle starts.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -84,7 +82,7 @@ public class BattleCommandsHelper {
         return "Successfully added new command to trainer!";
     }
 
-    public static String addPlayerWinsCommand(NPCTrainer trainer, String... args) {
+    public static String addPlayerWinsCommand(NPCEntity trainer, String... args) {
         //Stores a command in a ListNBT to be run when a player wins.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -101,7 +99,7 @@ public class BattleCommandsHelper {
         return "Successfully added new command to trainer!";
     }
 
-    public static String addPlayerLosesCommand(NPCTrainer trainer, String... args) {
+    public static String addPlayerLosesCommand(NPCEntity trainer, String... args) {
         //Stores a command in a ListNBT to be run when a player loses.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -118,7 +116,7 @@ public class BattleCommandsHelper {
         return "Successfully added new command to trainer!";
     }
 
-    public static String addForfeitCommand(NPCTrainer trainer, String... args) {
+    public static String addForfeitCommand(NPCEntity trainer, String... args) {
         //Stores a command in a ListNBT to be run when a forfeit happens.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -135,7 +133,24 @@ public class BattleCommandsHelper {
         return "Successfully added new command to trainer!";
     }
 
-    public static String removeStartCommand(NPCTrainer trainer, String... args) {
+    public static String addInteractCommand(NPCEntity trainer, String... args) {
+        //Stores a command in a ListNBT to be run when a forfeit happens.
+        if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
+            return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
+        CompoundNBT main = (CompoundNBT) trainer.getPersistentData().get(TrainerUtilsTags.MAIN_TAG.getId());
+        if (!main.contains(BattleCommandsTypes.INTERACT.getId()))
+            main.put(BattleCommandsTypes.INTERACT.getId(), new ListNBT());
+        ListNBT list = main.getList(BattleCommandsTypes.INTERACT.getId(), Constants.NBT.TAG_STRING);
+        StringBuilder cmdBuilder = new StringBuilder();
+        for (int i = 0; i < args.length; i++) {
+            cmdBuilder.append(args[i]);
+            if (i < args.length - 1) cmdBuilder.append(" ");
+        }
+        list.add(list.size(), StringNBT.valueOf(cmdBuilder.toString()));
+        return "Successfully added new command to trainer!";
+    }
+
+    public static String removeStartCommand(NPCEntity trainer, String... args) {
         //Removes a command from the ListNBT managing battle starts.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -153,7 +168,7 @@ public class BattleCommandsHelper {
         list.remove(slot.intValue());
         return "Successfully removed command from trainer!";
     }
-    public static String removeForfeitCommand(NPCTrainer trainer, String... args) {
+    public static String removeForfeitCommand(NPCEntity trainer, String... args) {
         //Removes a command from the ListNBT managing forfeits.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -171,7 +186,7 @@ public class BattleCommandsHelper {
         list.remove(slot.intValue());
         return "Successfully removed command from trainer!";
     }
-    public static String removePlayerWinsCommand(NPCTrainer trainer, String... args) {
+    public static String removePlayerWinsCommand(NPCEntity trainer, String... args) {
         //Removes a command from the ListNBT managing player wins.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -189,7 +204,7 @@ public class BattleCommandsHelper {
         list.remove(slot.intValue());
         return "Successfully removed command from trainer!";
     }
-    public static String removePlayerLosesCommand(NPCTrainer trainer, String... args) {
+    public static String removePlayerLosesCommand(NPCEntity trainer, String... args) {
         //Removes a command from the ListNBT managing player losses.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -207,7 +222,27 @@ public class BattleCommandsHelper {
         list.remove(slot.intValue());
         return "Successfully removed command from trainer!";
     }
-    public static String clearStartCommands(NPCTrainer trainer) {
+
+    public static String removeInteractCommand(NPCEntity trainer, String... args) {
+        //Removes a command from the ListNBT managing player losses.
+        if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
+            return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
+        if(args.length != 1) return "Too many arguments provided";
+        Integer slot = Integer.parseInt(args[0]);
+        if(slot == null) return "Argument must be an integer!";
+        slot -= 1;
+        CompoundNBT main = (CompoundNBT) trainer.getPersistentData().get(TrainerUtilsTags.MAIN_TAG.getId());
+        if (!main.contains(BattleCommandsTypes.INTERACT.PLAYER_LOSS.getId()))
+            main.put(BattleCommandsTypes.INTERACT.getId(), new ListNBT());
+        ListNBT list = main.getList(BattleCommandsTypes.INTERACT.getId(), Constants.NBT.TAG_STRING);
+        if(list.isEmpty()) return "This trainer does not have any commands to remove from this category";
+        if(slot >= list.size()) return "Slot number provided is bigger than the size of this list!";
+        if(slot < 0) return "Slot number must be 1 or higher!";
+        list.remove(slot.intValue());
+        return "Successfully removed command from trainer!";
+    }
+
+    public static String clearStartCommands(NPCEntity trainer) {
         //Clears the ListNBT managing battle starts.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -218,7 +253,7 @@ public class BattleCommandsHelper {
         list.clear();
         return "Successfully cleared commands from trainer!";
     }
-    public static String clearForfeitCommands(NPCTrainer trainer) {
+    public static String clearForfeitCommands(NPCEntity trainer) {
         //Clears the ListNBT managing forfeits.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -229,7 +264,7 @@ public class BattleCommandsHelper {
         list.clear();
         return "Successfully cleared commands from trainer!";
     }
-    public static String clearPlayerWinCommands(NPCTrainer trainer) {
+    public static String clearPlayerWinCommands(NPCEntity trainer) {
         //Clears the ListNBT managing player wins.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -240,7 +275,7 @@ public class BattleCommandsHelper {
         list.clear();
         return "Successfully cleared commands from trainer!";
     }
-    public static String clearPlayerLossCommands(NPCTrainer trainer) {
+    public static String clearPlayerLossCommands(NPCEntity trainer) {
         //Clears the ListNBT managing player losses.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -252,7 +287,19 @@ public class BattleCommandsHelper {
         return "Successfully cleared commands from trainer!";
     }
 
-    public static String listStartCommands(NPCTrainer trainer) {
+    public static String clearInteractCommands(NPCEntity trainer) {
+        //Clears the ListNBT managing player losses.
+        if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
+            return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
+        CompoundNBT main = (CompoundNBT) trainer.getPersistentData().get(TrainerUtilsTags.MAIN_TAG.getId());
+        if (!main.contains(BattleCommandsTypes.INTERACT.getId()))
+            main.put(BattleCommandsTypes.INTERACT.getId(), new ListNBT());
+        ListNBT list = main.getList(BattleCommandsTypes.INTERACT.getId(), Constants.NBT.TAG_STRING);
+        list.clear();
+        return "Successfully cleared commands from trainer!";
+    }
+
+    public static String listStartCommands(NPCEntity trainer) {
         //Displays the ListNBT managing battle starts.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -276,7 +323,7 @@ public class BattleCommandsHelper {
         resBuilder.append("=== START COMMANDS ===");
         return resBuilder.toString();
     }
-    public static String listForfeitCommands(NPCTrainer trainer) {
+    public static String listForfeitCommands(NPCEntity trainer) {
         //Displays the ListNBT managing battle forfeits.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -299,7 +346,7 @@ public class BattleCommandsHelper {
         resBuilder.append("=== FORFEIT COMMANDS ===");
         return resBuilder.toString();
     }
-    public static String listPlayerWinsCommands(NPCTrainer trainer) {
+    public static String listPlayerWinsCommands(NPCEntity trainer) {
         //Displays the ListNBT managing player wins.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -322,7 +369,7 @@ public class BattleCommandsHelper {
         resBuilder.append("=== PLAYER WIN COMMANDS ===");
         return resBuilder.toString();
     }
-    public static String listPlayerLossCommands(NPCTrainer trainer) {
+    public static String listPlayerLossCommands(NPCEntity trainer) {
         //Displays the ListNBT managing player losses.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -343,6 +390,30 @@ public class BattleCommandsHelper {
             }
         }
         resBuilder.append("=== PLAYER LOSS COMMANDS ===");
+        return resBuilder.toString();
+    }
+
+    public static String listInteractCommands(NPCEntity trainer) {
+        //Displays the ListNBT managing player losses.
+        if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
+            return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
+        CompoundNBT main = (CompoundNBT) trainer.getPersistentData().get(TrainerUtilsTags.MAIN_TAG.getId());
+        if (!main.contains(BattleCommandsTypes.INTERACT.getId()))
+            main.put(BattleCommandsTypes.INTERACT.getId(), new ListNBT());
+        ListNBT list = main.getList(BattleCommandsTypes.INTERACT.getId(), Constants.NBT.TAG_STRING);
+        StringBuilder resBuilder = new StringBuilder();
+        resBuilder.append("=== INTERACT COMMANDS ===\n");
+        int counter = 1;
+        for(INBT inbt: list) {
+            if(inbt instanceof StringNBT) {
+                resBuilder.append(counter);
+                resBuilder.append("). ");
+                StringNBT nbt = (StringNBT) inbt;
+                resBuilder.append(nbt.getAsString());
+                resBuilder.append("\n");
+            }
+        }
+        resBuilder.append("=== INTERACT COMMANDS ===");
         return resBuilder.toString();
     }
 }

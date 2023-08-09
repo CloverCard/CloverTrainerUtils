@@ -239,7 +239,7 @@ In Pixelmon Reforged, there are many options for customizing trainers such as ba
   <tr>
    <td>Add Trainer Command
    </td>
-   <td>/tutils commands add [start OR forfeit OR playerwins OR playerloses] [command]
+   <td>/tutils commands add [start OR forfeit OR playerwins OR playerloses OR interact] [command]
    </td>
    <td>Performs a command after the specified event happens.
    </td>
@@ -247,7 +247,7 @@ In Pixelmon Reforged, there are many options for customizing trainers such as ba
   <tr>
    <td>View Trainer Commands
    </td>
-   <td>/tutils commands list [start OR forfeit OR playerwins OR playerloses]
+   <td>/tutils commands list [start OR forfeit OR playerwins OR playerloses OR interact]
    </td>
    <td>Lists the commands that are performed after the specified event in order added.
    </td>
@@ -255,7 +255,7 @@ In Pixelmon Reforged, there are many options for customizing trainers such as ba
   <tr>
    <td>Remove A Trainer Command
    </td>
-   <td>/tutils commands remove [start OR forfeit OR playerwins OR playerloses] [order_number]
+   <td>/tutils commands remove [start OR forfeit OR playerwins OR playerloses OR interact] [order_number]
    </td>
    <td>Removes the command at the position of the order number.
    </td>
@@ -263,7 +263,7 @@ In Pixelmon Reforged, there are many options for customizing trainers such as ba
   <tr>
    <td>Clear Trainer Commands
    </td>
-   <td>/tutils commands clear [start OR forfeit OR playerwins OR playerloses]
+   <td>/tutils commands clear [start OR forfeit OR playerwins OR playerloses OR interact]
    </td>
    <td>Clears all commands on a trainer for the specified event.
    </td>
@@ -592,3 +592,4 @@ Within the json file, multiple different teams can be defined under the map call
     }
   }
 }
+</pre>

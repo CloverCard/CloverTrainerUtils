@@ -108,6 +108,11 @@ public class TUtils {
                                                                 .executes(cmd -> addPlayerLosesCommand(cmd.getSource(), StringArgumentType.getString(cmd, "args")))
                                                         )
                                                 )
+                                                .then(Commands.literal("interact")
+                                                        .then(Commands.argument("args", StringArgumentType.greedyString())
+                                                                .executes(cmd -> addInteractCommand(cmd.getSource(), StringArgumentType.getString(cmd, "args")))
+                                                        )
+                                                )
                                         )
                                         .then(Commands.literal("remove")
                                                 .then(Commands.literal("start")
@@ -130,6 +135,11 @@ public class TUtils {
                                                                 .executes(cmd -> removePlayerLosesCommand(cmd.getSource(), StringArgumentType.getString(cmd, "args")))
                                                         )
                                                 )
+                                                .then(Commands.literal("interact")
+                                                        .then(Commands.argument("args", StringArgumentType.greedyString())
+                                                                .executes(cmd -> removeInteractCommand(cmd.getSource(), StringArgumentType.getString(cmd, "args")))
+                                                        )
+                                                )
                                         )
                                         .then(Commands.literal("clear")
                                                 .then(Commands.literal("start")
@@ -144,6 +154,9 @@ public class TUtils {
                                                 .then(Commands.literal("playerloses")
                                                         .executes(cmd -> clearPlayerLosesCommand(cmd.getSource()))
                                                 )
+                                                .then(Commands.literal("interact")
+                                                        .executes(cmd -> clearInteractCommand(cmd.getSource()))
+                                                )
                                         )
                                         .then(Commands.literal("list")
                                                 .then(Commands.literal("start")
@@ -157,6 +170,9 @@ public class TUtils {
                                                 )
                                                 .then(Commands.literal("playerloses")
                                                         .executes(cmd -> listPlayerLosesCommand(cmd.getSource()))
+                                                )
+                                                .then(Commands.literal("interact")
+                                                        .executes(cmd -> listInteractCommand(cmd.getSource()))
                                                 )
                                         )
                         )
@@ -189,7 +205,7 @@ public class TUtils {
         if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
         ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
         String msg = "====== CloverTrainerUtils ======\n\n" +
-                "- Version 1.0.0 - Written By CloverCard\n\n" +
+                "- Version 1.0.4 - Written By CloverCard\n\n" +
                 "====== COMMANDS ======\n\n" +
                 "- /tutils init: Enables a trainer to cloned and customized.\n\n" +
                 "- /tutils clear: Clears all tutils data on a trainer.\n\n" +
@@ -203,10 +219,10 @@ public class TUtils {
                 "- /tutils conddrops list: Lists a trainer's conditional drops in the order added.\n\n" +
                 "- /tutils conddrops clear: Removes all of a trainer's conditional drops.\n\n" +
                 "- /tutils conddrops remove [order_number]: Removes a conditional drop currently in the order number's position.\n\n" +
-                "- /tutils commands add [start OR forfeit OR playerwins OR playerloses] [command]: Performs a command after the specified event happens.\n\n" +
-                "- /tutils commands list [start OR forfeit OR playerwins OR playerloses]: Lists the commands that are performed after the specified event in order added.\n\n" +
-                "- /tutils commands remove [start OR forfeit OR playerwins OR playerloses] [order_number]: Removes a command at the position of the order number from a trainer in the specified event.\n\n" +
-                "- /tutils commands clear [start OR forfeit OR playerwins OR playerloses]: Clears all commands on a trainer for the specified event.\n\n" +
+                "- /tutils commands add [start OR forfeit OR playerwins OR playerloses OR interact] [command]: Performs a command after the specified event happens.\n\n" +
+                "- /tutils commands list [start OR forfeit OR playerwins OR playerloses OR interact]: Lists the commands that are performed after the specified event in order added.\n\n" +
+                "- /tutils commands remove [start OR forfeit OR playerwins OR playerloses OR interact] [order_number]: Removes a command at the position of the order number from a trainer in the specified event.\n\n" +
+                "- /tutils commands clear [start OR forfeit OR playerwins OR playerloses OR interact]: Clears all commands on a trainer for the specified event.\n\n" +
                 "- /tutils shuffler add [team_id]: Adds a team defined in the config to potentially select at the start of a battle.\n\n" +
                 "- /tutils shuffler remove [team_id]: Removes the team id provided from the ids a trainer can shuffle through.\n\n" +
                 "- /tutils shuffler clear: Clears all the teams a trainer can shuffle through.\n\n" +
@@ -320,6 +336,14 @@ public class TUtils {
         return 0;
     }
 
+    private int addInteractCommand(CommandSource src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
+        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+        PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_INTERACT_COMMAND, args, 300));
+        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        return 0;
+    }
+
     private int removeStartCommand(CommandSource src, String args) {
         if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
         ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
@@ -345,6 +369,14 @@ public class TUtils {
         if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
         ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.REMOVE_PLAYER_LOSS_COMMAND, args, 300));
+        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        return 0;
+    }
+
+    private int removeInteractCommand(CommandSource src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
+        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+        PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.REMOVE_INTERACT_COMMAND, args, 300));
         player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
         return 0;
     }
@@ -377,6 +409,13 @@ public class TUtils {
         player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
         return 0;
     }
+    private int clearInteractCommand(CommandSource src) {
+        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
+        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+        PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.CLEAR_INTERACT_COMMANDS, null, 300));
+        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        return 0;
+    }
 
     private int listStartCommand(CommandSource src) {
         if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
@@ -403,6 +442,14 @@ public class TUtils {
         if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
         ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_LOSS_COMMANDS, null, 300));
+        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        return 0;
+    }
+
+    private int listInteractCommand(CommandSource src) {
+        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
+        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+        PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_INTERACT_COMMANDS, null, 300));
         player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
         return 0;
     }

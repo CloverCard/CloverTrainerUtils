@@ -31,6 +31,6 @@ side = "BOTH"
 [[dependencies.clovertrainerutils]]
 modId = "pixelmon"
 mandatory = true
-versionRange = "[9.1.2,)"
+versionRange = "[9.1.6,)"
 ordering = "NONE"
 side = "BOTH"

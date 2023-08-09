@@ -4,7 +4,8 @@ public enum BattleCommandsTypes {
     START_BATTLE_COMMANDS("cloverbattlestart"),
     FORFEIT_BATTLE_COMMANDS("cloverbattleforfeit"),
     PLAYER_WINS("cloverplayerwin"),
-    PLAYER_LOSS("cloverplayerloss");
+    PLAYER_LOSS("cloverplayerloss"),
+    INTERACT("cloverinteract");
     private String id;
     private BattleCommandsTypes(String id) {
         this.id = id;
