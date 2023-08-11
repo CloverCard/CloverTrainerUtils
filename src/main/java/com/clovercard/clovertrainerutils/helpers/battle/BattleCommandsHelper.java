@@ -5,6 +5,7 @@ import com.clovercard.clovertrainerutils.enums.battle.BattleCommandsTypes;
 import com.clovercard.clovertrainerutils.listeners.BattleCommandsTickQueue;
 import com.clovercard.clovertrainerutils.objects.requests.BattleCommand;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 public class BattleCommandsHelper {
     //Puts BattleCommands into the BattleCommandsTickQueue
-    public static void enqueueCommands(String tagId, ServerPlayerEntity player, NPCEntity trainer) {
+    public static void enqueueCommands(String tagId, ServerPlayerEntity player, Entity trainer) {
         //Get the main tag nbt
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
         CompoundNBT main = (CompoundNBT) trainer.getPersistentData().get(TrainerUtilsTags.MAIN_TAG.getId());
@@ -133,7 +134,7 @@ public class BattleCommandsHelper {
         return "Successfully added new command to trainer!";
     }
 
-    public static String addInteractCommand(NPCEntity trainer, String... args) {
+    public static String addInteractCommand(Entity trainer, String... args) {
         //Stores a command in a ListNBT to be run when a forfeit happens.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -223,7 +224,7 @@ public class BattleCommandsHelper {
         return "Successfully removed command from trainer!";
     }
 
-    public static String removeInteractCommand(NPCEntity trainer, String... args) {
+    public static String removeInteractCommand(Entity trainer, String... args) {
         //Removes a command from the ListNBT managing player losses.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -287,7 +288,7 @@ public class BattleCommandsHelper {
         return "Successfully cleared commands from trainer!";
     }
 
-    public static String clearInteractCommands(NPCEntity trainer) {
+    public static String clearInteractCommands(Entity trainer) {
         //Clears the ListNBT managing player losses.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
@@ -393,7 +394,7 @@ public class BattleCommandsHelper {
         return resBuilder.toString();
     }
 
-    public static String listInteractCommands(NPCEntity trainer) {
+    public static String listInteractCommands(Entity trainer) {
         //Displays the ListNBT managing player losses.
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId()))
             return "This trainer is not initialized! Use '/tutils init' in order to use this command!";

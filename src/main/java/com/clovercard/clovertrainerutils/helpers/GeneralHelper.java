@@ -10,13 +10,14 @@ import com.pixelmonmod.pixelmon.api.storage.TrainerPartyStorage;
 import com.pixelmonmod.pixelmon.battles.attacks.Attack;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCEntity;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
+import com.pixelmonmod.pixelmon.entities.pixelmon.StatueEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 
 import java.util.ArrayList;
 
 public class GeneralHelper {
-    public static void initUtilsNbt(NPCTrainer trainer) {
+    public static void initUtilsNbt(StatueEntity trainer) {
         //Add needed NBT tags and structures to trainer
         trainer.getPersistentData().put(TrainerUtilsTags.MAIN_TAG.getId(), new CompoundNBT());
         CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
@@ -24,6 +25,7 @@ public class GeneralHelper {
         main.put(BattleCommandsTypes.FORFEIT_BATTLE_COMMANDS.getId(), new ListNBT());
         main.put(BattleCommandsTypes.PLAYER_WINS.getId(), new ListNBT());
         main.put(BattleCommandsTypes.PLAYER_LOSS.getId(), new ListNBT());
+        main.put(BattleCommandsTypes.INTERACT.getId(), new ListNBT());
         main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListNBT());
     }
 
@@ -35,6 +37,7 @@ public class GeneralHelper {
         main.put(BattleCommandsTypes.FORFEIT_BATTLE_COMMANDS.getId(), new ListNBT());
         main.put(BattleCommandsTypes.PLAYER_WINS.getId(), new ListNBT());
         main.put(BattleCommandsTypes.PLAYER_LOSS.getId(), new ListNBT());
+        main.put(BattleCommandsTypes.INTERACT.getId(), new ListNBT());
         main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListNBT());
     }
 
