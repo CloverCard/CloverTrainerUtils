@@ -43,15 +43,16 @@ public class BattleCommandsHelper {
             String[] args = cmd.split(" ");
             //Handle placeholders
             for(int i = 0; i < args.length; i++) {
-                if(args[i].startsWith("@PL")) {
-                    cmdBuilder.append(player.getName().getString());
+                if(args[i].contains("@PL")) {
+                    String res = args[i].replaceAll("@PL", player.getName().getString());
+                    cmdBuilder.append(res);
                     if(i < args.length-1) cmdBuilder.append(" ");
                 }
-                else if (args[i].startsWith("@D")) {
+                else if (args[i].contains("@D")) {
                     String[] subArg = args[i].split(":");
                     if(subArg.length == 2) delay = Integer.parseInt(subArg[1]);
                 }
-                else if (args[i].startsWith("@PCMD")) {
+                else if (args[i].contains("@PCMD")) {
                     uuid = player.getUUID();
                 }
                 else {
@@ -342,6 +343,7 @@ public class BattleCommandsHelper {
                 StringNBT nbt = (StringNBT) inbt;
                 resBuilder.append(nbt.getAsString());
                 resBuilder.append("\n");
+                counter++;
             }
         }
         resBuilder.append("=== FORFEIT COMMANDS ===");
@@ -365,6 +367,7 @@ public class BattleCommandsHelper {
                 StringNBT nbt = (StringNBT) inbt;
                 resBuilder.append(nbt.getAsString());
                 resBuilder.append("\n");
+                counter++;
             }
         }
         resBuilder.append("=== PLAYER WIN COMMANDS ===");
@@ -388,6 +391,7 @@ public class BattleCommandsHelper {
                 StringNBT nbt = (StringNBT) inbt;
                 resBuilder.append(nbt.getAsString());
                 resBuilder.append("\n");
+                counter++;
             }
         }
         resBuilder.append("=== PLAYER LOSS COMMANDS ===");
@@ -412,6 +416,7 @@ public class BattleCommandsHelper {
                 StringNBT nbt = (StringNBT) inbt;
                 resBuilder.append(nbt.getAsString());
                 resBuilder.append("\n");
+                counter++;
             }
         }
         resBuilder.append("=== INTERACT COMMANDS ===");
