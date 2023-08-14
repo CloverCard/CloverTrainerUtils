@@ -55,6 +55,11 @@ public class BattleListeners {
         for (BattleParticipant participant : event.getTeamTwo()) {
             if (participant instanceof PlayerParticipant) {
                 player = ((PlayerParticipant) participant).player;
+                List<Pokemon> pkms = new ArrayList<>();
+                for(PixelmonWrapper pw: participant.getTeamPokemon()) {
+                    if(pw != null) pkms.add(pw.pokemon);
+                }
+                selection = pkms;
             } else if (participant instanceof TrainerParticipant) {
                 trainerExists = true;
                 trainer = ((TrainerParticipant) participant).trainer;

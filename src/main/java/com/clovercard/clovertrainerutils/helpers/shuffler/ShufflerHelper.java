@@ -98,6 +98,7 @@ public class ShufflerHelper {
         return teamIds.get(index);
     }
     public static void startTrainerBattle(ServerPlayerEntity player, NPCTrainer trainer, List<Pokemon> selection) {
+        if(player == null) return;
         //Register NPC and player for battle
         int controlled = 1;
         if(trainer.battleRules.getOrDefault(BattleRuleRegistry.BATTLE_TYPE) == BattleType.DOUBLE) controlled = 2;
