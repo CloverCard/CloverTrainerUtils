@@ -4,6 +4,7 @@ import com.clovercard.clovertrainerutils.configs.shuffler.MemberConfig;
 import com.clovercard.clovertrainerutils.configs.shuffler.TeamConfig;
 import com.clovercard.clovertrainerutils.enums.TrainerUtilsTags;
 import com.clovercard.clovertrainerutils.enums.shuffler.ShufflerTags;
+import com.pixelmonmod.pixelmon.api.battles.BattleType;
 import com.pixelmonmod.pixelmon.api.battles.attack.AttackRegistry;
 import com.pixelmonmod.pixelmon.api.pokemon.Nature;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
@@ -12,9 +13,9 @@ import com.pixelmonmod.pixelmon.api.pokemon.ability.AbilityRegistry;
 import com.pixelmonmod.pixelmon.api.pokemon.species.gender.Gender;
 import com.pixelmonmod.pixelmon.api.pokemon.stats.Moveset;
 import com.pixelmonmod.pixelmon.api.registries.PixelmonSpecies;
-import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import com.pixelmonmod.pixelmon.api.util.helpers.ResourceLocationHelper;
 import com.pixelmonmod.pixelmon.battles.BattleRegistry;
+import com.pixelmonmod.pixelmon.battles.api.rules.BattleRuleRegistry;
 import com.pixelmonmod.pixelmon.battles.attacks.Attack;
 import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipant;
 import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
@@ -96,11 +97,14 @@ public class ShufflerHelper {
         int index = (int) Math.floor(Math.random()*teamIds.size());
         return teamIds.get(index);
     }
-    public static void startTrainerSingleBattle(ServerPlayerEntity player, NPCTrainer trainer) {
+    public static void startTrainerBattle(ServerPlayerEntity player, NPCTrainer trainer, List<Pokemon> selection) {
         //Register NPC and player for battle
-        PlayerParticipant pp = new PlayerParticipant(player, StorageProxy.getParty(player).getSelectedPokemon());
-        TrainerParticipant tp = new TrainerParticipant(trainer, player, 1);
-        BattleRegistry.startBattle(new BattleParticipant[] {pp}, new BattleParticipant[] {tp}, trainer.battleRules);
+        int controlled = 1;
+        if(trainer.battleRules.getOrDefault(BattleRuleRegistry.BATTLE_TYPE) == BattleType.DOUBLE) controlled = 2;
+        if(trainer.battleRules.getOrDefault(BattleRuleRegistry.BATTLE_TYPE) == BattleType.TRIPLE) controlled = 3;
+        PlayerParticipant pp = new PlayerParticipant(player, selection, controlled);
+        TrainerParticipant tp = new TrainerParticipant(trainer, player, controlled);
+        if(trainer.canStartBattle(player, false)) BattleRegistry.startBattle(new BattleParticipant[] {pp}, new BattleParticipant[] {tp}, trainer.battleRules);
     }
 
     public static String addShuffleTeam(NPCTrainer trainer, String ... args) {

@@ -43,16 +43,16 @@ public class BattleCommandsHelper {
             String[] args = cmd.split(" ");
             //Handle placeholders
             for(int i = 0; i < args.length; i++) {
-                if(args[i].contains("@PL")) {
-                    String res = args[i].replaceAll("@PL", player.getName().getString());
+                if(args[i].toLowerCase().contains("@pl")) {
+                    String res = args[i].toLowerCase().replaceAll("@pl", player.getName().getString());
                     cmdBuilder.append(res);
                     if(i < args.length-1) cmdBuilder.append(" ");
                 }
-                else if (args[i].contains("@D")) {
+                else if (args[i].toLowerCase().contains("@d")) {
                     String[] subArg = args[i].split(":");
                     if(subArg.length == 2) delay = Integer.parseInt(subArg[1]);
                 }
-                else if (args[i].contains("@PCMD")) {
+                else if (args[i].toLowerCase().contains("@pcmd")) {
                     uuid = player.getUUID();
                 }
                 else {

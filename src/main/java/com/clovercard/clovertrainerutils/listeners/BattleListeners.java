@@ -17,10 +17,7 @@ import com.pixelmonmod.pixelmon.api.pokemon.boss.BossTierRegistry;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
 import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import com.pixelmonmod.pixelmon.api.storage.TrainerPartyStorage;
-import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipant;
-import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
-import com.pixelmonmod.pixelmon.battles.controller.participants.TrainerParticipant;
-import com.pixelmonmod.pixelmon.battles.controller.participants.WildPixelmonParticipant;
+import com.pixelmonmod.pixelmon.battles.controller.participants.*;
 import com.pixelmonmod.pixelmon.comm.SetTrainerData;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
 import com.pixelmonmod.pixelmon.enums.EnumEncounterMode;
@@ -31,6 +28,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BattleListeners {
     @SubscribeEvent
@@ -39,10 +37,16 @@ public class BattleListeners {
         //Get Player and Trainer if they exist
         ServerPlayerEntity player = null;
         NPCTrainer trainer = null;
+        List<Pokemon> selection = new ArrayList<>();
         boolean trainerExists = false;
         for (BattleParticipant participant : event.getTeamOne()) {
             if (participant instanceof PlayerParticipant) {
                 player = ((PlayerParticipant) participant).player;
+                List<Pokemon> pkms = new ArrayList<>();
+                for(PixelmonWrapper pw: participant.getTeamPokemon()) {
+                    if(pw != null) pkms.add(pw.pokemon);
+                }
+                selection = pkms;
             } else if (participant instanceof TrainerParticipant) {
                 trainerExists = true;
                 trainer = ((TrainerParticipant) participant).trainer;
@@ -97,6 +101,7 @@ public class BattleListeners {
             temp.winMessage = trainer.winMessage;
             temp.loseMessage = trainer.loseMessage;
             temp.greeting = trainer.greeting;
+
             temp.getPersistentData().put(TrainerUtilsTags.MAIN_TAG.getId(), main.copy());
             CompoundNBT tempMain = temp.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
             tempMain.putBoolean(TrainerUtilsTags.CLONE_TRAINER.getId(), true);
@@ -118,7 +123,8 @@ public class BattleListeners {
             if(!trainer.getBossTier().equals(BossTierRegistry.NOT_BOSS)) temp.setBossTier(trainer.getBossTier());
 
             temp.update(new SetTrainerData("Trainer", temp.greeting, temp.winMessage, temp.loseMessage, temp.winMoney, temp.getWinnings()));
-            ShufflerHelper.startTrainerSingleBattle(player, temp);
+            if(selection.isEmpty()) return;
+            else ShufflerHelper.startTrainerBattle(player, temp, selection);
         }
     }
 
