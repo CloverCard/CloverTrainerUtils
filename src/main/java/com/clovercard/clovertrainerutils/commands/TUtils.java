@@ -205,7 +205,7 @@ public class TUtils {
         if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
         ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
         String msg = "====== CloverTrainerUtils ======\n\n" +
-                "- Version 1.0.4 - Written By CloverCard\n\n" +
+                "- Version 1.0.5 - Written By CloverCard\n\n" +
                 "====== COMMANDS ======\n\n" +
                 "- /tutils init: Enables a trainer to cloned and customized.\n\n" +
                 "- /tutils clear: Clears all tutils data on a trainer.\n\n" +
