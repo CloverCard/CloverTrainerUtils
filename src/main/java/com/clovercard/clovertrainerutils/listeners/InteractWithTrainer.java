@@ -9,10 +9,14 @@ import com.clovercard.clovertrainerutils.helpers.checkpoints.CheckpointsHelper;
 import com.clovercard.clovertrainerutils.helpers.shuffler.ShufflerHelper;
 import com.clovercard.clovertrainerutils.objects.requests.InteractRequest;
 import com.pixelmonmod.pixelmon.api.events.npc.NPCEvent;
+import com.pixelmonmod.pixelmon.entities.npcs.NPCChatting;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCEntity;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -23,12 +27,17 @@ public class InteractWithTrainer {
         PlayerEntity player = event.player;
         //Ensure only requests get through
         if (!PlayerCommandsTickListener.pendingRequests.containsKey(event.player.getUUID())) {
-            if(!(event.npc instanceof NPCTrainer)) {
-                BattleCommandsHelper.enqueueCommands(BattleCommandsTypes.INTERACT.getId(), (ServerPlayerEntity) event.player, event.npc);
+            if (!(event.npc instanceof NPCTrainer)) {
+                if (event.npc instanceof NPCChatting) {
+                    CompoundNBT playerNbt = player.getPersistentData();
+                    if (!playerNbt.contains("ctutilsplcmds")) {
+                        attachCommandsToPlayer((ServerPlayerEntity) player, event.npc);
+                    }
+                } else
+                    BattleCommandsHelper.enqueueCommands(BattleCommandsTypes.INTERACT.getId(), (ServerPlayerEntity) event.player, event.npc);
             }
             return;
-        }
-        else {
+        } else {
             NPCEntity npc = event.npc;
             NPCTrainer trainer = null;
 
@@ -150,7 +159,7 @@ public class InteractWithTrainer {
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
                 case ADD_INTERACT_COMMAND:
-                    if(trainer == null) res = BattleCommandsHelper.addInteractCommand(npc, req.getSplitArgs());
+                    if (trainer == null) res = BattleCommandsHelper.addInteractCommand(npc, req.getSplitArgs());
                     else res = "This cannot work on a trainer npc!";
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
@@ -165,17 +174,19 @@ public class InteractWithTrainer {
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
                 case REMOVE_PLAYER_LOSS_COMMAND:
-                    if (trainer != null) res = BattleCommandsHelper.removePlayerLosesCommand(npc, req.getSplitArgs());
+                    if (trainer != null)
+                        res = BattleCommandsHelper.removePlayerLosesCommand(npc, req.getSplitArgs());
                     else res = "This cannot work on a non-trainer npc!";
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
                 case REMOVE_PLAYER_WIN_COMMAND:
-                    if (trainer != null) res = BattleCommandsHelper.removePlayerWinsCommand(npc, req.getSplitArgs());
+                    if (trainer != null)
+                        res = BattleCommandsHelper.removePlayerWinsCommand(npc, req.getSplitArgs());
                     else res = "This cannot work on a non-trainer npc!";
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
                 case REMOVE_INTERACT_COMMAND:
-                    if(trainer == null) res = BattleCommandsHelper.removeInteractCommand(npc, req.getSplitArgs());
+                    if (trainer == null) res = BattleCommandsHelper.removeInteractCommand(npc, req.getSplitArgs());
                     else res = "This cannot work on a trainer npc!";
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
@@ -200,7 +211,7 @@ public class InteractWithTrainer {
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
                 case LIST_INTERACT_COMMANDS:
-                    if(trainer == null) res = BattleCommandsHelper.listInteractCommands(npc);
+                    if (trainer == null) res = BattleCommandsHelper.listInteractCommands(npc);
                     else res = "This cannot work on a trainer npc!";
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
@@ -225,12 +236,30 @@ public class InteractWithTrainer {
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
                 case CLEAR_INTERACT_COMMANDS:
-                    if(trainer == null) res = BattleCommandsHelper.clearInteractCommands(npc);
+                    if (trainer == null) res = BattleCommandsHelper.clearInteractCommands(npc);
                     else res = "This cannot work on a trainer npc!";
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
             }
             PlayerCommandsTickListener.pendingRequests.remove(player.getUUID());
         }
+
+    }
+
+    private static void attachCommandsToPlayer(ServerPlayerEntity player, Entity trainer) {
+        //Get the main tag nbt
+        if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
+        CompoundNBT main = (CompoundNBT) trainer.getPersistentData().get(TrainerUtilsTags.MAIN_TAG.getId());
+        String tagId = BattleCommandsTypes.INTERACT.getId();
+
+        //Make sure the input tag is a command type
+        if (!BattleCommandsTypes.contains(tagId)) return;
+
+        //Make current data is in a valid format
+        assert main != null;
+        if (!main.contains(tagId)) main.put(tagId, new ListNBT());
+        if (!(main.get(tagId) instanceof ListNBT)) main.put(tagId, new ListNBT());
+        ListNBT nbtList = (ListNBT) main.get(tagId);
+        if (nbtList != null) player.getPersistentData().put("ctutilsplcmds", nbtList);
     }
 }

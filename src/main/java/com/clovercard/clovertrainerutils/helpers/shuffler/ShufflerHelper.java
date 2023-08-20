@@ -103,6 +103,8 @@ public class ShufflerHelper {
         int controlled = 1;
         if(trainer.battleRules.getOrDefault(BattleRuleRegistry.BATTLE_TYPE) == BattleType.DOUBLE) controlled = 2;
         if(trainer.battleRules.getOrDefault(BattleRuleRegistry.BATTLE_TYPE) == BattleType.TRIPLE) controlled = 3;
+        if(trainer.battleRules.getOrDefault(BattleRuleRegistry.BATTLE_TYPE) == BattleType.ROTATION) controlled = 3;
+        if(trainer.battleRules.getOrDefault(BattleRuleRegistry.BATTLE_TYPE) == BattleType.HORDE) controlled = 5;
         PlayerParticipant pp = new PlayerParticipant(player, selection, controlled);
         TrainerParticipant tp = new TrainerParticipant(trainer, player, controlled);
         if(trainer.canStartBattle(player, false)) BattleRegistry.startBattle(new BattleParticipant[] {pp}, new BattleParticipant[] {tp}, trainer.battleRules);

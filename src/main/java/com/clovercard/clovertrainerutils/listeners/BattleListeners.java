@@ -20,9 +20,12 @@ import com.pixelmonmod.pixelmon.api.storage.TrainerPartyStorage;
 import com.pixelmonmod.pixelmon.battles.controller.participants.*;
 import com.pixelmonmod.pixelmon.comm.SetTrainerData;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
+import com.pixelmonmod.pixelmon.entities.pixelmon.PixelmonEntity;
 import com.pixelmonmod.pixelmon.enums.EnumEncounterMode;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -43,7 +46,7 @@ public class BattleListeners {
             if (participant instanceof PlayerParticipant) {
                 player = ((PlayerParticipant) participant).player;
                 List<Pokemon> pkms = new ArrayList<>();
-                for(PixelmonWrapper pw: participant.getTeamPokemon()) {
+                for(PixelmonWrapper pw: participant.allPokemon) {
                     if(pw != null) pkms.add(pw.pokemon);
                 }
                 selection = pkms;
@@ -56,7 +59,7 @@ public class BattleListeners {
             if (participant instanceof PlayerParticipant) {
                 player = ((PlayerParticipant) participant).player;
                 List<Pokemon> pkms = new ArrayList<>();
-                for(PixelmonWrapper pw: participant.getTeamPokemon()) {
+                for(PixelmonWrapper pw: participant.allPokemon) {
                     if(pw != null) pkms.add(pw.pokemon);
                 }
                 selection = pkms;
@@ -97,7 +100,6 @@ public class BattleListeners {
             //Create Clone Trainer
             event.setCanceled(true);
             NPCTrainer temp = new NPCTrainer(trainer.level);
-            temp.setPersistenceRequired();
             temp.setPos(player.getX(), player.getY(), player.getZ());
             if(trainer.getWinnings() != null) temp.updateDrops(trainer.getWinnings());
             if(trainer.battleRules != null) temp.battleRules = trainer.battleRules;
@@ -129,7 +131,12 @@ public class BattleListeners {
 
             temp.update(new SetTrainerData("Trainer", temp.greeting, temp.winMessage, temp.loseMessage, temp.winMoney, temp.getWinnings()));
             if(selection.isEmpty()) return;
-            else ShufflerHelper.startTrainerBattle(player, temp, selection);
+            else {
+                temp.setPos(player.getX(), player.getY(), player.getZ());
+                player.getLevel().addFreshEntity(temp);
+                temp.addEffect(new EffectInstance(Effects.INVISIBILITY, Integer.MAX_VALUE, 0, true, true));
+                ShufflerHelper.startTrainerBattle(player, temp, selection);
+            }
         }
     }
 

@@ -30,6 +30,8 @@ public class CloverTrainerUtils {
         Pixelmon.EVENT_BUS.register(new InteractWithTrainer());
         MinecraftForge.EVENT_BUS.register(new PlayerCommandsTickListener());
         MinecraftForge.EVENT_BUS.register(new StatueInteract());
+        Pixelmon.EVENT_BUS.register(new ChatListener());
+        Pixelmon.EVENT_BUS.register(new DialogueEnd());
         MemberConfig.DATA.load();
         TeamConfig.DATA.load();
         RewardPresetConfig.DATA.load();
