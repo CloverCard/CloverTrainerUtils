@@ -15,7 +15,7 @@ public class DialogueMaker {
                     .setText(text.next())
                             .addChoice(
                                     new Choice.ChoiceBuilder()
-                                            .setText("Next")
+                                            .setText("-->")
                                             .setHandle(a -> {
                                                 if(text.hasNext()) a.reply(createDialogue(text));
                                                 else a.setAction(DialogueNextActionPacket.DialogueGuiAction.CLOSE);

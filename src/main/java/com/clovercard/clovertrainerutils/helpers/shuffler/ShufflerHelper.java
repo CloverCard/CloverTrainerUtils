@@ -13,6 +13,8 @@ import com.pixelmonmod.pixelmon.api.pokemon.ability.AbilityRegistry;
 import com.pixelmonmod.pixelmon.api.pokemon.species.gender.Gender;
 import com.pixelmonmod.pixelmon.api.pokemon.stats.Moveset;
 import com.pixelmonmod.pixelmon.api.registries.PixelmonSpecies;
+import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
+import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import com.pixelmonmod.pixelmon.api.util.helpers.ResourceLocationHelper;
 import com.pixelmonmod.pixelmon.battles.BattleRegistry;
 import com.pixelmonmod.pixelmon.battles.api.rules.BattleRuleRegistry;
@@ -105,7 +107,16 @@ public class ShufflerHelper {
         if(trainer.battleRules.getOrDefault(BattleRuleRegistry.BATTLE_TYPE) == BattleType.TRIPLE) controlled = 3;
         if(trainer.battleRules.getOrDefault(BattleRuleRegistry.BATTLE_TYPE) == BattleType.ROTATION) controlled = 3;
         if(trainer.battleRules.getOrDefault(BattleRuleRegistry.BATTLE_TYPE) == BattleType.HORDE) controlled = 5;
-        PlayerParticipant pp = new PlayerParticipant(player, selection, controlled);
+
+        PlayerParticipant pp;
+        if(trainer.battleRules.isDefault()) {
+            PlayerPartyStorage storage = StorageProxy.getParty(player);
+            Pokemon selected = null;
+            if(storage != null) selected = storage.getSelectedPokemon();
+            if(selected != null) pp = new PlayerParticipant(player, selected);
+            else pp = new PlayerParticipant(player, selection, controlled);
+        }
+        else pp = new PlayerParticipant(player, selection, controlled);
         TrainerParticipant tp = new TrainerParticipant(trainer, player, controlled);
         if(trainer.canStartBattle(player, false)) BattleRegistry.startBattle(new BattleParticipant[] {pp}, new BattleParticipant[] {tp}, trainer.battleRules);
     }

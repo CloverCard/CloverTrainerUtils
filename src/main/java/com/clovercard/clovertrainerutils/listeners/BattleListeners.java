@@ -20,7 +20,7 @@ import com.pixelmonmod.pixelmon.api.storage.TrainerPartyStorage;
 import com.pixelmonmod.pixelmon.battles.controller.participants.*;
 import com.pixelmonmod.pixelmon.comm.SetTrainerData;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
-import com.pixelmonmod.pixelmon.entities.pixelmon.PixelmonEntity;
+import com.pixelmonmod.pixelmon.entities.npcs.registry.BaseTrainer;
 import com.pixelmonmod.pixelmon.enums.EnumEncounterMode;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -100,6 +100,8 @@ public class BattleListeners {
             //Create Clone Trainer
             event.setCanceled(true);
             NPCTrainer temp = new NPCTrainer(trainer.level);
+            temp.init(new BaseTrainer("TUtils Trainer"));
+            temp.clearGreetings();
             temp.setPos(player.getX(), player.getY(), player.getZ());
             if(trainer.getWinnings() != null) temp.updateDrops(trainer.getWinnings());
             if(trainer.battleRules != null) temp.battleRules = trainer.battleRules;
