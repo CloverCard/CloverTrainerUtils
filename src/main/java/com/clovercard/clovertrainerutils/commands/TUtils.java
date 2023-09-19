@@ -5,13 +5,14 @@ import com.clovercard.clovertrainerutils.listeners.PlayerCommandsTickListener;
 import com.clovercard.clovertrainerutils.objects.requests.InteractRequest;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
+import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.Commands;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.StringTextComponent;
 
 public class TUtils {
+    
     public TUtils(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(
                 Commands.literal("tutils")

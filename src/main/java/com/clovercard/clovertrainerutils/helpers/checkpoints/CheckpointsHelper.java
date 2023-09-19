@@ -3,8 +3,8 @@ package com.clovercard.clovertrainerutils.helpers.checkpoints;
 import com.clovercard.clovertrainerutils.enums.TrainerUtilsTags;
 import com.clovercard.clovertrainerutils.enums.checkpoints.CheckpointTags;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Set;
 
@@ -12,7 +12,7 @@ public class CheckpointsHelper {
     public static String addTagsToTrainer(NPCTrainer trainer, String ... args) {
         //Check if initialized and args length is correct
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         if(args.length != 2) return "An incorrect amount of arguments was provided.";
         //Add checkpoints for check point and next batle
         if(args[0] != null && args[1] != null) {
@@ -39,7 +39,7 @@ public class CheckpointsHelper {
     public static String removeTagsFromTrainer(NPCTrainer trainer) {
         //Check if initialized and args length is correct
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         StringBuilder resBuilder = new StringBuilder();
         //Remove check point if exists
         if(main.contains(CheckpointTags.CHECKPOINT_TAG.getKey())) {
@@ -58,7 +58,7 @@ public class CheckpointsHelper {
     public static String listTagsFromTrainer(NPCTrainer trainer) {
         //Check if initialized and args length is correct
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         StringBuilder resBuilder = new StringBuilder();
         //Get check point to display if exists
         if(main.contains(CheckpointTags.CHECKPOINT_TAG.getKey())) {
@@ -74,10 +74,10 @@ public class CheckpointsHelper {
         if(res.length() < 1) res = "There were no checkpoint tags to list!";
         return res;
     }
-    public static boolean playerHasAccess(ServerPlayerEntity player, NPCTrainer trainer) {
+    public static boolean playerHasAccess(ServerPlayer player, NPCTrainer trainer) {
         //Check if a player has the checkpoint flag required to battle
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return true;
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         if(!main.contains(CheckpointTags.CHECKPOINT_TAG.getKey())) return true;
         String value = main.getString(CheckpointTags.CHECKPOINT_TAG.getKey());
         if(value == null) return true;
@@ -91,18 +91,18 @@ public class CheckpointsHelper {
     public static boolean hasCheckpointTag(NPCTrainer trainer) {
         //Check if a trainer has a checkpoint tag
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return false;
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         return main.contains(CheckpointTags.CHECKPOINT_TAG.getKey());
     }
     public static boolean hasNextCheckpointTag(NPCTrainer trainer) {
         //Check if a trainer has a next battle tag
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return false;
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         return main.contains(CheckpointTags.NEXT_BATTLE_TAG.getKey());
     }
-    public static void handlePlayerWin(ServerPlayerEntity player, NPCTrainer trainer) {
+    public static void handlePlayerWin(ServerPlayer player, NPCTrainer trainer) {
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         if(hasCheckpointTag(trainer)) {
             //Remove current checkpoint
             Set<String> tags = player.getTags();
@@ -115,12 +115,12 @@ public class CheckpointsHelper {
             player.addTag(main.getString(CheckpointTags.NEXT_BATTLE_TAG.getKey()));
         }
     }
-    public static void handlePlayerLoss(ServerPlayerEntity player, NPCTrainer trainer) {
+    public static void handlePlayerLoss(ServerPlayer player, NPCTrainer trainer) {
         if(!hasCheckpointTag(trainer)) return;
 
         //Remove current checkpoint
         Set<String> tags = player.getTags();
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         String checkpoint = main.getString(CheckpointTags.CHECKPOINT_TAG.getKey());
         if(tags == null) return;
         player.removeTag(checkpoint);
