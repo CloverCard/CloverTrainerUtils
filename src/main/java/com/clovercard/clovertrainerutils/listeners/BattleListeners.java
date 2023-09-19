@@ -22,10 +22,10 @@ import com.pixelmonmod.pixelmon.comm.SetTrainerData;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
 import com.pixelmonmod.pixelmon.entities.npcs.registry.BaseTrainer;
 import com.pixelmonmod.pixelmon.enums.EnumEncounterMode;
-import net.minecraft.client.renderer.EffectInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -135,7 +135,7 @@ public class BattleListeners {
             if (!selection.isEmpty()) {
                 temp.setPos(player.getX(), player.getY(), player.getZ());
                 player.getCommandSenderWorld().addFreshEntity(temp);
-                temp.addEffect(new EffectInstance(MobEffects.INVISIBILITY, Integer.MAX_VALUE, 0, true, true));
+                temp.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, Integer.MAX_VALUE, 0, true, true));
                 ShufflerHelper.startTrainerBattle(player, temp, selection);
             }
         }
