@@ -6,16 +6,16 @@ plugins {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.16.5'
+    mappings channel: 'official', version: '1.20.1'
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 group = 'com.clovercard.clovertrainerutils'
-version = '1.0.6'
+version = '2.0.1'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.17
+targetCompatibility = 1.17
 
 repositories {
     mavenCentral()
@@ -39,9 +39,9 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.39'
+    minecraft 'net.minecraftforge:forge:1.20.1-47.1.46'
 
-    implementation fg.deobf('pixelmon:Pixelmon-1.16.5-9.1.7-server:9.1.7')
+    implementation fg.deobf('pixelmon:Pixelmon-1.20.1-9.2.2-server:9.2.2')
 }
 
 tasks.withType(JavaCompile) {
