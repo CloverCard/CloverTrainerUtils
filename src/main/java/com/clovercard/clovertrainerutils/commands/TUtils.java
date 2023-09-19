@@ -5,15 +5,16 @@ import com.clovercard.clovertrainerutils.listeners.PlayerCommandsTickListener;
 import com.clovercard.clovertrainerutils.objects.requests.InteractRequest;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+
+//TODO: Verify sendSystemMessage and CommandSourceStack instead of CommandSource
 
 public class TUtils {
-    
-    public TUtils(CommandDispatcher<CommandSource> dispatcher) {
+
+    public TUtils(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 Commands.literal("tutils")
                         .then(
@@ -188,23 +189,23 @@ public class TUtils {
                         )
         );
     }
-    private int init(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int init(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.INIT_TRAINER, null, 600));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int clear(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int clear(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.RESET_TRAINER, null, 600));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int about(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int about(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         String msg = "====== CloverTrainerUtils ======\n\n" +
                 "- Version 1.0.5 - Written By CloverCard\n\n" +
                 "====== COMMANDS ======\n\n" +
@@ -232,255 +233,256 @@ public class TUtils {
                 "- @PL: Get's the player's username.\n\n" +
                 "- @PCMD: Makes the player run the command.\n\n" +
                 "- @D:#: Delays the commands by the amount of seconds provided";
-        StringTextComponent msgObject = new StringTextComponent(msg);
-        player.sendMessage(msgObject, Util.NIL_UUID);
+
+        player.sendSystemMessage(Component.literal(msg));
         return 0;
     }
-    private int addCheckpoints(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addCheckpoints(CommandSourceStack src, String args) {
+        
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_CHECKPOINTS, args, 600));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int addBeginningCheckpoint(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addBeginningCheckpoint(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_CHECKPOINT_BEGINNING, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int addFinalCheckpoint(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addFinalCheckpoint(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_CHECKPOINT_END, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int clearCheckpoint(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int clearCheckpoint(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.CLEAR_CHECKPOINTS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int listCheckpoints(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int listCheckpoints(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_CHECKPOINT, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
 
-    private int addCondDrops(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addCondDrops(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_COND_DROP, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int addCondDropsPreset(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addCondDropsPreset(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_COND_DROP_PRESET, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int removeCondDrops(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int removeCondDrops(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.REMOVE_COND_DROP, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int clearCondDrops(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int clearCondDrops(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.CLEAR_COND_DROP, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int listCondDrops(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int listCondDrops(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_COND_DROP, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
 
-    private int addStartCommand(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addStartCommand(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_START_COMMAND, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int addForfeitCommand(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addForfeitCommand(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_FORFEIT_COMMAND, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int addPlayerWinsCommand(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addPlayerWinsCommand(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_PLAYER_WIN_COMMAND, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int addPlayerLosesCommand(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addPlayerLosesCommand(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_PLAYER_LOSS_COMMAND, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
 
-    private int addInteractCommand(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addInteractCommand(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_INTERACT_COMMAND, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
 
-    private int removeStartCommand(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int removeStartCommand(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.REMOVE_START_COMMAND, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int removeForfeitCommand(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int removeForfeitCommand(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.REMOVE_FORFEIT_COMMAND, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int removePlayerWinsCommand(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int removePlayerWinsCommand(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.REMOVE_PLAYER_WIN_COMMAND, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int removePlayerLosesCommand(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int removePlayerLosesCommand(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.REMOVE_PLAYER_LOSS_COMMAND, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
 
-    private int removeInteractCommand(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int removeInteractCommand(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.REMOVE_INTERACT_COMMAND, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
 
-    private int clearStartCommand(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int clearStartCommand(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.CLEAR_START_COMMANDS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int clearForfeitCommand(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int clearForfeitCommand(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.CLEAR_FORFEIT_COMMANDS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int clearPlayerWinsCommand(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int clearPlayerWinsCommand(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.CLEAR_PLAYER_WIN_COMMANDS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int clearPlayerLosesCommand(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int clearPlayerLosesCommand(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.CLEAR_PLAYER_LOSS_COMMANDS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int clearInteractCommand(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int clearInteractCommand(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.CLEAR_INTERACT_COMMANDS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
 
-    private int listStartCommand(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int listStartCommand(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_START_COMMANDS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int listForfeitCommand(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int listForfeitCommand(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_FORFEIT_COMMANDS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int listPlayerWinsCommand(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int listPlayerWinsCommand(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_PLAYER_WIN_COMMANDS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int listPlayerLosesCommand(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int listPlayerLosesCommand(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_LOSS_COMMANDS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
 
-    private int listInteractCommand(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int listInteractCommand(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_INTERACT_COMMANDS, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
 
-    private int addShuffleTeam(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int addShuffleTeam(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_SHUFFLE, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int removeShuffleTeam(CommandSource src, String args) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int removeShuffleTeam(CommandSourceStack src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.REMOVE_SHUFFLE, args, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int clearShuffleTeam(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int clearShuffleTeam(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.CLEAR_SHUFFLE, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
-    private int listShuffleTeam(CommandSource src) {
-        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
-        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+    private int listShuffleTeam(CommandSourceStack src) {
+        if(!(src.getEntity() instanceof ServerPlayer)) return 1;
+        ServerPlayer player = (ServerPlayer) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_SHUFFLE, null, 300));
-        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        player.sendSystemMessage(Component.literal("[CloverTrainerUtils] All set! Right click a trainer to process your request!"));
         return 0;
     }
 }
