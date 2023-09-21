@@ -1,7 +1,5 @@
 package com.clovercard.clovertrainerutils.configs.battle;
 
-import net.minecraft.nbt.ListNBT;
-
 public class RewardInstance {
     private String type;
     private String data;

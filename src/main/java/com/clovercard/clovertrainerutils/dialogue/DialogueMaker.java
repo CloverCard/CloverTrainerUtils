@@ -3,7 +3,7 @@ package com.clovercard.clovertrainerutils.dialogue;
 import com.pixelmonmod.pixelmon.api.dialogue.Choice;
 import com.pixelmonmod.pixelmon.api.dialogue.Dialogue;
 import com.pixelmonmod.pixelmon.comm.packetHandlers.dialogue.DialogueNextActionPacket;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,7 +27,7 @@ public class DialogueMaker {
         }
         return null;
     }
-    public static void setChatterToDialogue(ServerPlayerEntity player, ArrayList<String> message) {
+    public static void setChatterToDialogue(ServerPlayer player, ArrayList<String> message) {
         Iterator<String> text = message.iterator();
         Dialogue dialogue = createDialogue(text);
         if(dialogue == null) return;
