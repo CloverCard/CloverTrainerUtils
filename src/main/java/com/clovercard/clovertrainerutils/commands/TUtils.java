@@ -10,8 +10,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
-//TODO: Verify sendSystemMessage and CommandSourceStack instead of CommandSource
-
 public class TUtils {
 
     public TUtils(CommandDispatcher<CommandSourceStack> dispatcher) {

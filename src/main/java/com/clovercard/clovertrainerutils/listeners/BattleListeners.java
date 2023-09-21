@@ -99,7 +99,7 @@ public class BattleListeners {
         else {
             //Create Clone Trainer
             event.setCanceled(true);
-            NPCTrainer temp = new NPCTrainer(trainer.getCommandSenderWorld()); //TODO: Unsure
+            NPCTrainer temp = new NPCTrainer(trainer.getCommandSenderWorld());
             temp.init(new BaseTrainer("TUtils Trainer"));
             temp.clearGreetings();
             temp.setPos(player.getX(), player.getY(), player.getZ());
