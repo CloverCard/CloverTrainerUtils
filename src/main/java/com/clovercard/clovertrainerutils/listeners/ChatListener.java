@@ -4,6 +4,7 @@ import com.clovercard.clovertrainerutils.dialogue.DialogueMaker;
 import com.clovercard.clovertrainerutils.enums.TrainerUtilsTags;
 import com.pixelmonmod.pixelmon.api.events.NPCChatEvent;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCChatting;
+import com.pixelmonmod.pixelmon.entities.npcs.NPCFisherman;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCQuestGiver;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 public class ChatListener {
     @SubscribeEvent
     public void onChat(NPCChatEvent event) {
-        if(!(event.npc instanceof NPCQuestGiver)) return;
+        if(event.npc instanceof NPCFisherman) return;
         if(!(event.player instanceof ServerPlayerEntity)) return;
         ServerPlayerEntity player = (ServerPlayerEntity) event.player;
         NPCChatting npc = (NPCChatting) event.npc;
