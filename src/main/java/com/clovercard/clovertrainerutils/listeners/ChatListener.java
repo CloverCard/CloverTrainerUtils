@@ -5,7 +5,6 @@ import com.clovercard.clovertrainerutils.enums.TrainerUtilsTags;
 import com.pixelmonmod.pixelmon.api.events.NPCChatEvent;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCChatting;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCFisherman;
-import com.pixelmonmod.pixelmon.entities.npcs.NPCQuestGiver;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
