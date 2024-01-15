@@ -12,7 +12,7 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 group = 'com.clovercard.clovertrainerutils'
-version = '1.0.6'
+version = '1.0.7'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -41,7 +41,7 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.39'
 
-    implementation fg.deobf('pixelmon:Pixelmon-1.16.5-9.1.7-server:9.1.7')
+    implementation fg.deobf('pixelmon:Pixelmon-1.16.5-9.1.10-server:9.1.10')
 }
 
 tasks.withType(JavaCompile) {

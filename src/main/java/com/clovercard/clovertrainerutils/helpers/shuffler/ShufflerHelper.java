@@ -144,6 +144,7 @@ public class ShufflerHelper {
         if(!main.contains(ShufflerTags.SHUFFLING_TRAINER.getId())) return "This trainer already has no shuffle teams";
         ListNBT teamsList = main.getList(ShufflerTags.SHUFFLING_TRAINER.getId(), Constants.NBT.TAG_STRING);
         teamsList.remove(StringNBT.valueOf(teamId));
+        if(teamsList.size() == 0) main.remove(ShufflerTags.SHUFFLING_TRAINER.getId());
         return "Successfully remove the team id, " + teamId + ", from this trainer's shuffle list";
     }
 
