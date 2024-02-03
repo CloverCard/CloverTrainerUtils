@@ -85,6 +85,14 @@ public class BattleListeners {
                 event.setCanceled(true);
                 return;
             }
+            else if (main.contains(TrainerUtilsTags.CLONE_TRAINER.getId())) {
+                //Handle Commands
+                BattleCommandsHelper.enqueueCommands(BattleCommandsTypes.START_BATTLE_COMMANDS.getId(), player, trainer);
+            }
+            //Make clone
+            else {
+                createClone(event, player, trainer, main, selection);
+            }
         }
         //Check if Clone
         else if (main.contains(TrainerUtilsTags.CLONE_TRAINER.getId())) {
@@ -172,7 +180,6 @@ public class BattleListeners {
         temp.getPersistentData().put(TrainerUtilsTags.MAIN_TAG.getId(), main.copy());
         CompoundNBT tempMain = temp.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         tempMain.putBoolean(TrainerUtilsTags.CLONE_TRAINER.getId(), true);
-
         //Add Conditional Reward Nbt data
         if(tempMain.contains(BattleRewardTags.COND_WINNINGS.getId())) {
             BattleRewardsHelper.setCondRewardsOnClone(temp);
