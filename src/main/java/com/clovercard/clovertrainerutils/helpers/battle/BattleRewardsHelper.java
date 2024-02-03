@@ -8,10 +8,9 @@ import com.clovercard.clovertrainerutils.enums.battle.BattleRewardTags;
 import com.pixelmonmod.pixelmon.api.util.helpers.RandomHelper;
 import com.pixelmonmod.pixelmon.api.util.helpers.ResourceLocationHelper;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
-import net.minecraft.util.IItemProvider;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
@@ -23,18 +22,18 @@ public class BattleRewardsHelper {
     public static void setCondRewardsOnClone(NPCTrainer trainer) {
         //Check if main tag is on trainer
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
 
         //Check if conditional winnings list is on trainer and is valid
         if (!main.contains(BattleRewardTags.COND_WINNINGS.getId())) return;
-        if (!(main.get(BattleRewardTags.COND_WINNINGS.getId()) instanceof ListNBT)) {
+        if (!(main.get(BattleRewardTags.COND_WINNINGS.getId()) instanceof ListTag)) {
             main.remove(BattleRewardTags.COND_WINNINGS.getId());
-            main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListNBT());
+            main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListTag());
             return;
         }
 
         //Get List and ensure there is data read
-        ListNBT nbtList = (ListNBT) main.get(BattleRewardTags.COND_WINNINGS.getId());
+        ListTag nbtList = (ListTag) main.get(BattleRewardTags.COND_WINNINGS.getId());
         if (nbtList == null) return;
         if (nbtList.isEmpty()) return;
 
@@ -42,29 +41,29 @@ public class BattleRewardsHelper {
         List<ItemStack> winnings = new ArrayList<>();
         winnings.addAll(0, Arrays.asList(trainer.getWinnings()));
 
-        if (!main.contains(BattleCommandsTypes.PLAYER_WINS.getId())) main.put(BattleCommandsTypes.PLAYER_WINS.getId(), new ListNBT());
-        ListNBT winningCmds = main.getList(BattleCommandsTypes.PLAYER_WINS.getId(), Constants.NBT.TAG_STRING);
+        if (!main.contains(BattleCommandsTypes.PLAYER_WINS.getId())) main.put(BattleCommandsTypes.PLAYER_WINS.getId(), new ListTag());
+        ListTag winningCmds = main.getList(BattleCommandsTypes.PLAYER_WINS.getId(), Tag.TAG_STRING);
 
         //Sort through rewards
-        for (INBT nbt : nbtList) {
+        for (Tag nbt : nbtList) {
             //Check if NBT is valid format
-            if (!(nbt instanceof CompoundNBT)) continue;
-            CompoundNBT rewardData = (CompoundNBT) nbt;
+            if (!(nbt instanceof CompoundTag)) continue;
+            CompoundTag rewardData = (CompoundTag) nbt;
             if (!rewardData.contains("type")) continue;
             else if (!rewardData.contains("data")) continue;
             else if (!rewardData.contains("prob")) continue;
             else if (!rewardData.contains("quantity")) continue;
-            else if (!(rewardData.get("type") instanceof StringNBT)) continue;
-            else if (!(rewardData.get("data") instanceof StringNBT)) continue;
-            else if (!(rewardData.get("prob") instanceof IntNBT)) continue;
-            else if (!(rewardData.get("quantity") instanceof IntNBT)) continue;
+            else if (!(rewardData.get("type") instanceof StringTag)) continue;
+            else if (!(rewardData.get("data") instanceof StringTag)) continue;
+            else if (!(rewardData.get("prob") instanceof IntTag)) continue;
+            else if (!(rewardData.get("quantity") instanceof IntTag)) continue;
 
 
             //Get NBT Data
-            StringNBT type = (StringNBT) rewardData.get("type");
-            StringNBT data = (StringNBT) rewardData.get("data");
-            IntNBT prob = (IntNBT) rewardData.get("prob");
-            IntNBT quantity = (IntNBT) rewardData.get("quantity");
+            StringTag type = (StringTag) rewardData.get("type");
+            StringTag data = (StringTag) rewardData.get("data");
+            IntTag prob = (IntTag) rewardData.get("prob");
+            IntTag quantity = (IntTag) rewardData.get("quantity");
 
             //Ensure NBT Data is not null
             if (type == null || data == null || prob == null || quantity == null) continue;
@@ -74,7 +73,7 @@ public class BattleRewardsHelper {
 
             //Add items
             if (type.getAsString().equals("item")) {
-                IItemProvider optItem = ForgeRegistries.ITEMS.getValue(ResourceLocationHelper.of(data.getAsString()));
+                Item optItem = ForgeRegistries.ITEMS.getValue(ResourceLocationHelper.of(data.getAsString()));
                 if (optItem == null) continue;
                 ItemStack item = new ItemStack(optItem, quantity.getAsInt());
                 winnings.add(item);
@@ -97,9 +96,9 @@ public class BattleRewardsHelper {
     }
     public static String addSingleDrop(NPCTrainer trainer, String ... args) {
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
-        if(!main.contains(BattleRewardTags.COND_WINNINGS.getId())) main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListNBT());
-        ListNBT list = main.getList(BattleRewardTags.COND_WINNINGS.getId(), Constants.NBT.TAG_COMPOUND);
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        if(!main.contains(BattleRewardTags.COND_WINNINGS.getId())) main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListTag());
+        ListTag list = main.getList(BattleRewardTags.COND_WINNINGS.getId(), Tag.TAG_COMPOUND);
         if(args.length < 4) return "This command was not provided the needed number of arguments";
         String type;
         String data;
@@ -124,7 +123,7 @@ public class BattleRewardsHelper {
             if(i < (args.length - 1)) dataBuilder.append(" ");
         }
         data = dataBuilder.toString();
-        CompoundNBT drop = new CompoundNBT();
+        CompoundTag drop = new CompoundTag();
         drop.putString("type", type);
         drop.putString("data", data);
         drop.putInt("prob", prob);
@@ -134,9 +133,9 @@ public class BattleRewardsHelper {
     }
     public static String removeSingleDrop(NPCTrainer trainer, String ... args) {
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
-        if(!main.contains(BattleRewardTags.COND_WINNINGS.getId())) main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListNBT());
-        ListNBT list = main.getList(BattleRewardTags.COND_WINNINGS.getId(), Constants.NBT.TAG_COMPOUND);
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        if(!main.contains(BattleRewardTags.COND_WINNINGS.getId())) main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListTag());
+        ListTag list = main.getList(BattleRewardTags.COND_WINNINGS.getId(), Tag.TAG_COMPOUND);
         if(args.length != 1) return "This command was not provided the needed number of arguments";
         Integer slot = Integer.parseInt(args[0]);
         if(slot == null) return "The argument provided needs to be an integer";
@@ -148,35 +147,35 @@ public class BattleRewardsHelper {
     }
     public static String listConditionalDrops(NPCTrainer trainer) {
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
-        if(!main.contains(BattleRewardTags.COND_WINNINGS.getId())) main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListNBT());
-        ListNBT list = main.getList(BattleRewardTags.COND_WINNINGS.getId(), Constants.NBT.TAG_COMPOUND);
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        if(!main.contains(BattleRewardTags.COND_WINNINGS.getId())) main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListTag());
+        ListTag list = main.getList(BattleRewardTags.COND_WINNINGS.getId(), Tag.TAG_COMPOUND);
         StringBuilder builder = new StringBuilder();
         builder.append("=== Conditional Drops ===\n");
         int counter = 1;
-        ArrayList<INBT> toRemove = new ArrayList<>();
-        for(INBT nbt: list) {
-            if(!(nbt instanceof CompoundNBT)) {
+        ArrayList<Tag> toRemove = new ArrayList<>();
+        for(Tag nbt: list) {
+            if(!(nbt instanceof CompoundTag)) {
                 toRemove.add(nbt);
                 continue;
             }
-            if(!((CompoundNBT) nbt).contains("type")) {
+            if(!((CompoundTag) nbt).contains("type")) {
                 toRemove.add(nbt);
                 continue;
             }
-            if(!((CompoundNBT) nbt).contains("data")) {
+            if(!((CompoundTag) nbt).contains("data")) {
                 toRemove.add(nbt);
                 continue;
             }
-            if(!((CompoundNBT) nbt).contains("prob")) {
+            if(!((CompoundTag) nbt).contains("prob")) {
                 toRemove.add(nbt);
                 continue;
             }
-            if(!((CompoundNBT) nbt).contains("quantity")) {
+            if(!((CompoundTag) nbt).contains("quantity")) {
                 toRemove.add(nbt);
                 continue;
             }
-            builder.append(counter + ") " + ((CompoundNBT) nbt).getString("type") + " " + ((CompoundNBT) nbt).getString("data") + " " + ((CompoundNBT) nbt).getInt("prob") + " " + ((CompoundNBT) nbt).getInt("quantity") + "\n");
+            builder.append(counter + ") " + ((CompoundTag) nbt).getString("type") + " " + ((CompoundTag) nbt).getString("data") + " " + ((CompoundTag) nbt).getInt("prob") + " " + ((CompoundTag) nbt).getInt("quantity") + "\n");
             counter++;
         }
         builder.append("=== Conditional Drops ===");
@@ -185,18 +184,18 @@ public class BattleRewardsHelper {
     }
     public static String clearDrops(NPCTrainer trainer) {
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
-        if(!main.contains(BattleRewardTags.COND_WINNINGS.getId())) main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListNBT());
-        ListNBT list = main.getList(BattleRewardTags.COND_WINNINGS.getId(), Constants.NBT.TAG_COMPOUND);
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        if(!main.contains(BattleRewardTags.COND_WINNINGS.getId())) main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListTag());
+        ListTag list = main.getList(BattleRewardTags.COND_WINNINGS.getId(), Tag.TAG_COMPOUND);
         list.clear();
         return "Successfully cleared all conditional drops from this trainer.";
     }
 
     public static String addPresetDrops(NPCTrainer trainer, String ... args) {
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
-        if(!main.contains(BattleRewardTags.COND_WINNINGS.getId())) main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListNBT());
-        ListNBT list = main.getList(BattleRewardTags.COND_WINNINGS.getId(), Constants.NBT.TAG_COMPOUND);
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        if(!main.contains(BattleRewardTags.COND_WINNINGS.getId())) main.put(BattleRewardTags.COND_WINNINGS.getId(), new ListTag());
+        ListTag list = main.getList(BattleRewardTags.COND_WINNINGS.getId(), Tag.TAG_COMPOUND);
         if(args.length != 1) return "This command was not provided the needed number of arguments";
 
         //Get preset if exists
@@ -208,7 +207,7 @@ public class BattleRewardsHelper {
             if(!inst.getType().equals("item") && !inst.getType().contains("cmd")) continue;
             if(inst.getProb() < 1 || inst.getProb() > 100) continue;
             if(inst.getQuantity() <= 0) continue;
-            CompoundNBT drop = new CompoundNBT();
+            CompoundTag drop = new CompoundTag();
             drop.putString("type", inst.getType());
             drop.putString("data", inst.getData());
             drop.putInt("prob", inst.getProb());

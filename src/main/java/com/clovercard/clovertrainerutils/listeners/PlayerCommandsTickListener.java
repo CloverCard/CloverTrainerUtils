@@ -1,12 +1,12 @@
 package com.clovercard.clovertrainerutils.listeners;
 
 import com.clovercard.clovertrainerutils.objects.requests.InteractRequest;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.StringTextComponent;
+import com.clovercard.clovertrainerutils.utils.MessageUtils;
+import net.minecraft.server.level.ServerPlayer;
+
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +27,8 @@ public class PlayerCommandsTickListener {
             req.setTimeout(time);
             if(time <= 0) {
                 toRemove.add(uuid);
-                ServerPlayerEntity player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
-                if(player != null) player.sendMessage(new StringTextComponent("You're request has expired!"), Util.NIL_UUID);
+                ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(uuid);
+                if(player != null) MessageUtils.sendTranslatableMessage(player, "ctu.prompt.timeout");
             }
         });
         toRemove.forEach(removed -> pendingRequests.remove(removed));

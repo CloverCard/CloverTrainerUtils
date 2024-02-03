@@ -5,12 +5,11 @@ import com.clovercard.clovertrainerutils.enums.battle.BattleCommandsTypes;
 import com.clovercard.clovertrainerutils.helpers.GeneralHelper;
 import com.clovercard.clovertrainerutils.helpers.battle.BattleCommandsHelper;
 import com.clovercard.clovertrainerutils.objects.requests.InteractRequest;
+import com.clovercard.clovertrainerutils.utils.MessageUtils;
 import com.pixelmonmod.pixelmon.entities.pixelmon.StatueEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -18,11 +17,11 @@ public class StatueInteract {
     @SubscribeEvent
     public void onInteractStatue(PlayerInteractEvent.EntityInteract event){
         if(!(event.getTarget() instanceof StatueEntity)) return;
-        if(event.getHand().equals(Hand.OFF_HAND)) return;
-        PlayerEntity player = event.getPlayer();
+        if(event.getHand().equals(InteractionHand.OFF_HAND)) return;
+        Player player = event.getEntity();
         //Ensure only requests get through
         if (!PlayerCommandsTickListener.pendingRequests.containsKey(player.getUUID())) {
-            BattleCommandsHelper.enqueueCommands(BattleCommandsTypes.INTERACT.getId(), (ServerPlayerEntity) player, event.getTarget());
+            BattleCommandsHelper.enqueueCommands(BattleCommandsTypes.INTERACT.getId(), (ServerPlayer) player, event.getTarget());
             return;
         }
         else {
@@ -33,41 +32,41 @@ public class StatueInteract {
             switch (req.getTag()) {
                 case INIT_TRAINER:
                     if (npc.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) {
-                        res = "This trainer has already been initialized!";
+                        res = "ctu.init.error";
                     } else {
-                        res = "Initialized trainer! It may now be customized!";
+                        res = "ctu.init.success";
                         GeneralHelper.initUtilsNbt(npc);
                     }
-                    player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
+                    MessageUtils.sendTranslatableMessage(player, res);
                     break;
                 case RESET_TRAINER:
                     if (npc.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) {
                         npc.getPersistentData().remove(TrainerUtilsTags.MAIN_TAG.getId());
-                        res = "This trainer's data has been cleared!";
+                        res = "ctu.clear.success";
                     } else {
-                        res = "This trainer has not been initialized, so there is no data to clear!";
+                        res = "ctu.clear.error";
                         GeneralHelper.initUtilsNbt(npc);
                     }
-                    player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
+                    MessageUtils.sendTranslatableMessage(player, res);
                     break;
                 case ADD_INTERACT_COMMAND:
                     res = BattleCommandsHelper.addInteractCommand(npc, req.getSplitArgs());
-                    player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
+                    MessageUtils.sendTranslatableMessage(player, res);
                     break;
                 case REMOVE_INTERACT_COMMAND:
                     res = BattleCommandsHelper.removeInteractCommand(npc, req.getSplitArgs());
-                    player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
+                    MessageUtils.sendTranslatableMessage(player, res);
                     break;
                 case LIST_INTERACT_COMMANDS:
                     res = BattleCommandsHelper.listInteractCommands(npc);
-                    player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
+                    MessageUtils.sendTranslatableMessage(player, res);
                     break;
                 case CLEAR_INTERACT_COMMANDS:
                     res = BattleCommandsHelper.clearInteractCommands(npc);
-                    player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
+                    MessageUtils.sendTranslatableMessage(player, res);
                     break;
                 default:
-                    player.sendMessage(new StringTextComponent("Statues may only have interaction commands!"), Util.NIL_UUID);
+                    MessageUtils.sendTranslatableMessage(player, "ctu.error.statue.noninteract");
             }
             PlayerCommandsTickListener.pendingRequests.remove(player.getUUID());
         }

@@ -1,6 +1,5 @@
 package com.clovercard.clovertrainerutils.configs.battle;
 
-import com.clovercard.clovertrainerutils.configs.shuffler.MemberConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

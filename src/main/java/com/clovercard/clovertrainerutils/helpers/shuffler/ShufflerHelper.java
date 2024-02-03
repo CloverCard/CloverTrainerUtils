@@ -23,13 +23,13 @@ import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipan
 import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
 import com.pixelmonmod.pixelmon.battles.controller.participants.TrainerParticipant;
 import com.pixelmonmod.pixelmon.entities.npcs.NPCTrainer;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.Util;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class ShufflerHelper {
         for(String member: pkmIds) {
             MemberConfig.PokemonMember pkmData = loadedPokemon.get(member);
             if(pkmData == null) continue;
-            if(!PixelmonSpecies.get(pkmData.getSpecies()).isPresent()) {
+            if(PixelmonSpecies.get(pkmData.getSpecies()).isEmpty()) {
                 continue;
             }
             Pokemon pkm = PokemonFactory.create(PixelmonSpecies.get(pkmData.getSpecies()).get().getValueUnsafe());
@@ -84,14 +84,14 @@ public class ShufflerHelper {
     public static String findRandomTeamId(NPCTrainer trainer) {
         //Get team ids stored on a trainer
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return null;
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         if(!main.contains(ShufflerTags.SHUFFLING_TRAINER.getId())) return null;
-        ListNBT teamNBTList = (ListNBT) main.get(ShufflerTags.SHUFFLING_TRAINER.getId());
+        ListTag teamNBTList = (ListTag) main.get(ShufflerTags.SHUFFLING_TRAINER.getId());
         if(teamNBTList == null) return null;
         List<String> teamIds = new ArrayList<>();
-        for(INBT inbt: teamNBTList) {
-            if(!(inbt instanceof StringNBT)) continue;
-            StringNBT nbt = (StringNBT) inbt;
+        for(Tag tag: teamNBTList) {
+            if(!(tag instanceof StringTag)) continue;
+            StringTag nbt = (StringTag) tag;
             teamIds.add(nbt.getAsString());
         }
         if(teamIds.isEmpty()) return null;
@@ -99,7 +99,7 @@ public class ShufflerHelper {
         int index = (int) Math.floor(Math.random()*teamIds.size());
         return teamIds.get(index);
     }
-    public static void startTrainerBattle(ServerPlayerEntity player, NPCTrainer trainer, List<Pokemon> selection) {
+    public static void startTrainerBattle(ServerPlayer player, NPCTrainer trainer, List<Pokemon> selection) {
         if(player == null) return;
         //Register NPC and player for battle
         int controlled = 1;
@@ -110,9 +110,9 @@ public class ShufflerHelper {
 
         PlayerParticipant pp;
         if(trainer.battleRules.isDefault()) {
-            PlayerPartyStorage storage = StorageProxy.getParty(player);
+            PlayerPartyStorage storage = StorageProxy.getParty(player).getNow(new PlayerPartyStorage(Util.NIL_UUID));
             Pokemon selected = null;
-            if(storage != null) selected = storage.getSelectedPokemon();
+            if(!storage.uuid.equals(Util.NIL_UUID)) selected = storage.getSelectedPokemon();
             if(selected != null) pp = new PlayerParticipant(player, selected);
             else pp = new PlayerParticipant(player, selection, controlled);
         }
@@ -124,26 +124,26 @@ public class ShufflerHelper {
     public static String addShuffleTeam(NPCTrainer trainer, String ... args) {
         //Check if trainer is initialized and arguments length is correct
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         if(args.length != 1) return "Invalid Argument Number! Expected 1 Argument";
-        //Add team id to ListNBT holding all team ids.
+        //Add team id to ListTag holding all team ids.
         String teamId = args[0];
-        if(!main.contains(ShufflerTags.SHUFFLING_TRAINER.getId())) main.put(ShufflerTags.SHUFFLING_TRAINER.getId(), new ListNBT());
-        ListNBT teamsList = main.getList(ShufflerTags.SHUFFLING_TRAINER.getId(), Constants.NBT.TAG_STRING);
-        teamsList.add(StringNBT.valueOf(teamId));
+        if(!main.contains(ShufflerTags.SHUFFLING_TRAINER.getId())) main.put(ShufflerTags.SHUFFLING_TRAINER.getId(), new ListTag());
+        ListTag teamsList = main.getList(ShufflerTags.SHUFFLING_TRAINER.getId(), Tag.TAG_STRING);
+        teamsList.add(StringTag.valueOf(teamId));
         return "Successfully added the team id, " + teamId + ", to this trainer's shuffle list";
     }
 
     public static String removeShuffleTeam(NPCTrainer trainer, String ... args) {
         //Check if trainer is initialized and arguments length is correct
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         if(args.length != 1) return "Invalid Argument Number! Expected 1 Argument";
-        //Remove team id from ListNBT holding all team ids
+        //Remove team id from ListTag holding all team ids
         String teamId = args[0];
         if(!main.contains(ShufflerTags.SHUFFLING_TRAINER.getId())) return "This trainer already has no shuffle teams";
-        ListNBT teamsList = main.getList(ShufflerTags.SHUFFLING_TRAINER.getId(), Constants.NBT.TAG_STRING);
-        teamsList.remove(StringNBT.valueOf(teamId));
+        ListTag teamsList = main.getList(ShufflerTags.SHUFFLING_TRAINER.getId(), Tag.TAG_STRING);
+        teamsList.remove(StringTag.valueOf(teamId));
         if(teamsList.size() == 0) main.remove(ShufflerTags.SHUFFLING_TRAINER.getId());
         return "Successfully remove the team id, " + teamId + ", from this trainer's shuffle list";
     }
@@ -151,15 +151,15 @@ public class ShufflerHelper {
     public static String listShuffleTeams(NPCTrainer trainer) {
         //Check if trainer is initialized and arguments length is correct
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         //Check if trainer has team ids listed
         if(!main.contains(ShufflerTags.SHUFFLING_TRAINER.getId())) return "This trainer has no shuffle teams";
-        ListNBT teamsList = main.getList(ShufflerTags.SHUFFLING_TRAINER.getId(), Constants.NBT.TAG_STRING);
+        ListTag teamsList = main.getList(ShufflerTags.SHUFFLING_TRAINER.getId(), Tag.TAG_STRING);
         if(teamsList.isEmpty()) return "This trainer has no shuffle teams";
         //Get and display existing team ids
         StringBuilder res = new StringBuilder("Shuffle Teams: [ ");
-        for(INBT inbt: teamsList) {
-            res.append(inbt.getAsString()).append(" ");
+        for(Tag tag: teamsList) {
+            res.append(tag.getAsString()).append(" ");
         }
         res.append("]");
         return res.toString();
@@ -168,7 +168,7 @@ public class ShufflerHelper {
     public static String clearShuffleTeams(NPCTrainer trainer) {
         //Check if trainer is initialized and arguments length is correct
         if(!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return "This trainer is not initialized! Use '/tutils init' in order to use this command!";
-        CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
+        CompoundTag main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         //Check if trainer has team id listed and remove it if so
         if(!main.contains(ShufflerTags.SHUFFLING_TRAINER.getId())) return "This trainer already has no shuffle teams";
         main.remove(ShufflerTags.SHUFFLING_TRAINER.getId());

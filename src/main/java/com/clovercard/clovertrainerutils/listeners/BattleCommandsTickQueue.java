@@ -1,10 +1,10 @@
 package com.clovercard.clovertrainerutils.listeners;
 
 import com.clovercard.clovertrainerutils.objects.requests.BattleCommand;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -23,9 +23,9 @@ public class BattleCommandsTickQueue {
         while(!commandQueue.isEmpty()) {
             BattleCommand cmdData = commandQueue.poll();
             String cmd = cmdData.getCommand();
-            ServerPlayerEntity player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(cmdData.getUser());
-            if(player == null) ServerLifecycleHooks.getCurrentServer().getCommands().performCommand(ServerLifecycleHooks.getCurrentServer().createCommandSourceStack(), cmd);
-            else ServerLifecycleHooks.getCurrentServer().getCommands().performCommand(player.createCommandSourceStack(), cmd);
+            ServerPlayer player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(cmdData.getUser());
+            if(player == null) ServerLifecycleHooks.getCurrentServer().getCommands().performPrefixedCommand(ServerLifecycleHooks.getCurrentServer().createCommandSourceStack(), cmd);
+            else ServerLifecycleHooks.getCurrentServer().getCommands().performPrefixedCommand(player.createCommandSourceStack(), cmd);
         }
         //Handle delayed commands
         if(delayHolder.isEmpty()) return;
