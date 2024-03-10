@@ -6,6 +6,7 @@ import com.clovercard.clovertrainerutils.helpers.GeneralHelper;
 import com.clovercard.clovertrainerutils.helpers.battle.BattleCommandsHelper;
 import com.clovercard.clovertrainerutils.helpers.battle.BattleRewardsHelper;
 import com.clovercard.clovertrainerutils.helpers.checkpoints.CheckpointsHelper;
+import com.clovercard.clovertrainerutils.helpers.permissions.PermissionsHelper;
 import com.clovercard.clovertrainerutils.helpers.shuffler.ShufflerHelper;
 import com.clovercard.clovertrainerutils.objects.requests.InteractRequest;
 import com.pixelmonmod.pixelmon.api.events.npc.NPCEvent;
@@ -240,10 +241,29 @@ public class InteractWithTrainer {
                     else res = "This cannot work on a trainer npc!";
                     player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
                     break;
+                case ADD_PERMISSION:
+                    if (trainer != null) res = PermissionsHelper.addPermissionsToTrainer(trainer, req.getSplitArgs());
+                    else res = "This cannot work on a non-trainer npc!";
+                    player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
+                    break;
+                case CLEAR_PERMISSIONS:
+                    if (trainer != null) res = PermissionsHelper.clearPermissionFromTrainer(trainer);
+                    else res = "This cannot work on a non-trainer npc!";
+                    player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
+                    break;
+                case REMOVE_PERMISSION:
+                    if (trainer != null) res = PermissionsHelper.removePermissionFromTrainer(trainer, req.getSplitArgs());
+                    else res = "This cannot work on a non-trainer npc!";
+                    player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
+                    break;
+                case LIST_PERMISSIONS:
+                    if (trainer != null) res = PermissionsHelper.listPermissionsFromTrainer(trainer);
+                    else res = "This cannot work on a non-trainer npc!";
+                    player.sendMessage(new StringTextComponent(res), Util.NIL_UUID);
+                    break;
             }
             PlayerCommandsTickListener.pendingRequests.remove(player.getUUID());
         }
-
     }
 
     private static void attachCommandsToPlayer(ServerPlayerEntity player, Entity trainer) {

@@ -58,7 +58,7 @@ public class RewardPresetConfig {
                 }
             }
             else {
-                System.out.println("An error occurred while trying to read the Boosts Config file!");
+                System.out.println("An error occurred while trying to read the Reward Preset Config file!");
                 System.err.println(err.fillInStackTrace());
             }
         }

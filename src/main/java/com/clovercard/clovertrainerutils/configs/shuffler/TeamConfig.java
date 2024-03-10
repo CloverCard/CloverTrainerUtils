@@ -77,7 +77,7 @@ public class TeamConfig {
                 }
             }
             else {
-                System.out.println("An error occurred while trying to read the Boosts Config file!");
+                System.out.println("An error occurred while trying to read the Team Config file!");
                 System.err.println(err.fillInStackTrace());
             }
         }

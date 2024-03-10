@@ -8,6 +8,7 @@ import com.clovercard.clovertrainerutils.helpers.GeneralHelper;
 import com.clovercard.clovertrainerutils.helpers.battle.BattleCommandsHelper;
 import com.clovercard.clovertrainerutils.helpers.battle.BattleRewardsHelper;
 import com.clovercard.clovertrainerutils.helpers.checkpoints.CheckpointsHelper;
+import com.clovercard.clovertrainerutils.helpers.permissions.PermissionsHelper;
 import com.clovercard.clovertrainerutils.helpers.shuffler.ShufflerHelper;
 import com.pixelmonmod.pixelmon.api.events.BeatTrainerEvent;
 import com.pixelmonmod.pixelmon.api.events.LostToTrainerEvent;
@@ -35,6 +36,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class BattleListeners {
     @SubscribeEvent
@@ -49,8 +51,8 @@ public class BattleListeners {
             if (participant instanceof PlayerParticipant) {
                 player = ((PlayerParticipant) participant).player;
                 List<Pokemon> pkms = new ArrayList<>();
-                for(PixelmonWrapper pw: participant.allPokemon) {
-                    if(pw != null) pkms.add(pw.pokemon);
+                for (PixelmonWrapper pw : participant.allPokemon) {
+                    if (pw != null) pkms.add(pw.pokemon);
                 }
                 selection = pkms;
             } else if (participant instanceof TrainerParticipant) {
@@ -62,8 +64,8 @@ public class BattleListeners {
             if (participant instanceof PlayerParticipant) {
                 player = ((PlayerParticipant) participant).player;
                 List<Pokemon> pkms = new ArrayList<>();
-                for(PixelmonWrapper pw: participant.allPokemon) {
-                    if(pw != null) pkms.add(pw.pokemon);
+                for (PixelmonWrapper pw : participant.allPokemon) {
+                    if (pw != null) pkms.add(pw.pokemon);
                 }
                 selection = pkms;
             } else if (participant instanceof TrainerParticipant) {
@@ -78,14 +80,19 @@ public class BattleListeners {
         if (!trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
         CompoundNBT main = trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
 
-        //Check for Checkpoints
-        if (CheckpointsHelper.hasCheckpointTag(trainer)) {
-            if (!CheckpointsHelper.playerHasAccess(player, trainer)) {
-                player.sendMessage(new StringTextComponent("You do not have access to this trainer fight!"), Util.NIL_UUID);
+        boolean usingCheckpoints = CheckpointsHelper.hasCheckpointTag(trainer);
+        boolean usingPerms = PermissionsHelper.hasPermissions(trainer);
+        //Check for Permissions & Checkpoints
+        if (usingCheckpoints || usingPerms) {
+            if (usingCheckpoints && !CheckpointsHelper.playerHasAccess(player, trainer)) {
+                player.sendMessage(new StringTextComponent("You do not have the checkpoint to this trainer fight!"), Util.NIL_UUID);
                 event.setCanceled(true);
                 return;
-            }
-            else if (main.contains(TrainerUtilsTags.CLONE_TRAINER.getId())) {
+            } else if (usingPerms && !PermissionsHelper.playerHasAccess(player, trainer)) {
+                player.sendMessage(new StringTextComponent("You do not have the permissions to access this trainer fight!"), Util.NIL_UUID);
+                event.setCanceled(true);
+                return;
+            } else if (main.contains(TrainerUtilsTags.CLONE_TRAINER.getId())) {
                 //Handle Commands
                 BattleCommandsHelper.enqueueCommands(BattleCommandsTypes.START_BATTLE_COMMANDS.getId(), player, trainer);
             }
@@ -107,27 +114,28 @@ public class BattleListeners {
 
     @SubscribeEvent
     public void onPlayerWin(BeatTrainerEvent event) {
-        if(!event.trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
+        if (!event.trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
         //Run Winning Commands
         BattleCommandsHelper.enqueueCommands(BattleCommandsTypes.PLAYER_WINS.getId(), event.player, event.trainer);
         //Delete Clone
         CompoundNBT main = event.trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         NPCTrainer clone = event.trainer;
-        if(event.trainer.level instanceof ServerWorld && clone.getPersistentData().contains("clbase")) {
+        if (event.trainer.level instanceof ServerWorld && clone.getPersistentData().contains("clbase")) {
             handleEncounter(clone, event.player);
         }
         CheckpointsHelper.handlePlayerWin(event.player, event.trainer);
-        if(main.contains(TrainerUtilsTags.CLONE_TRAINER.getId())) {
+        if (main.contains(TrainerUtilsTags.CLONE_TRAINER.getId())) {
             event.trainer.remove();
         }
     }
 
     @SubscribeEvent
     public void onPlayerLoss(LostToTrainerEvent event) {
-        if(!event.trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
+        if (!event.trainer.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) return;
         //Handle Forfeit Commands
-        if(this.isForfeit(event.player, event.trainer)) {
-            if(CheckpointsHelper.hasCheckpointTag(event.trainer) && !CheckpointsHelper.playerHasAccess(event.player, event.trainer)) return;
+        if (this.isForfeit(event.player, event.trainer)) {
+            if (CheckpointsHelper.hasCheckpointTag(event.trainer) && !CheckpointsHelper.playerHasAccess(event.player, event.trainer))
+                return;
             BattleCommandsHelper.enqueueCommands(BattleCommandsTypes.FORFEIT_BATTLE_COMMANDS.getId(), event.player, event.trainer);
         }
         //Handle Loss Commands
@@ -135,7 +143,7 @@ public class BattleListeners {
         //Delete Clone
         CompoundNBT main = event.trainer.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         CheckpointsHelper.handlePlayerLoss(event.player, event.trainer);
-        if(main.contains(TrainerUtilsTags.CLONE_TRAINER.getId())) {
+        if (main.contains(TrainerUtilsTags.CLONE_TRAINER.getId())) {
             event.trainer.remove();
         }
     }
@@ -146,18 +154,19 @@ public class BattleListeners {
         TrainerPartyStorage tStorage = trainer.getPokemonStorage();
         boolean playerHasPokemon = pStorage.countAblePokemon() > 0;
         boolean trainerHasPokemon = tStorage.countAblePokemon() > 0;
-        if(playerHasPokemon && trainerHasPokemon) return true;
+        if (playerHasPokemon && trainerHasPokemon) return true;
         return playerHasPokemon == trainerHasPokemon;
     }
+
     private void handleEncounter(NPCTrainer clone, ServerPlayerEntity player) {
         ServerWorld world = (ServerWorld) clone.level;
-        if(!clone.getPersistentData().contains("clbase")) return;
-        if(!clone.getPersistentData().contains("clenc")) return;
+        if (!clone.getPersistentData().contains("clbase")) return;
+        if (!clone.getPersistentData().contains("clenc")) return;
         String strUUID = clone.getPersistentData().getString("clbase");
         String encounterMode = clone.getPersistentData().getString("clenc");
         List<Entity> trainers = world.getEntities(clone.getType(), npc -> npc instanceof NPCTrainer);
-        for (Entity tr: trainers) {
-            if(strUUID.equals(tr.getStringUUID())) {
+        for (Entity tr : trainers) {
+            if (strUUID.equals(tr.getStringUUID())) {
                 NPCTrainer trainer = (NPCTrainer) tr;
                 if (encounterMode.equals(EnumEncounterMode.OncePerMCDay.name())) {
                     trainer.playerEncounters.put(player.getUUID(), player.getLevel().getGameTime());
@@ -170,6 +179,7 @@ public class BattleListeners {
             }
         }
     }
+
     private void createClone(BattleStartedEvent.Pre event, ServerPlayerEntity player, NPCTrainer trainer, CompoundNBT main, List<Pokemon> selection) {
         //Create Clone Trainer
         event.setCanceled(true);
@@ -180,13 +190,17 @@ public class BattleListeners {
         temp.getPersistentData().put(TrainerUtilsTags.MAIN_TAG.getId(), main.copy());
         CompoundNBT tempMain = temp.getPersistentData().getCompound(TrainerUtilsTags.MAIN_TAG.getId());
         tempMain.putBoolean(TrainerUtilsTags.CLONE_TRAINER.getId(), true);
+        long most = trainer.getUUID().getMostSignificantBits();
+        long least = trainer.getUUID().getLeastSignificantBits();
+        tempMain.putLong("ClOrg1", most);
+        tempMain.putLong("ClOrg2", least);
         //Add Conditional Reward Nbt data
-        if(tempMain.contains(BattleRewardTags.COND_WINNINGS.getId())) {
+        if (tempMain.contains(BattleRewardTags.COND_WINNINGS.getId())) {
             BattleRewardsHelper.setCondRewardsOnClone(temp);
         }
 
         //Handle Encounter Modes
-        if(trainer.getEncounterMode().isTimedAccess() || trainer.getEncounterMode() == EnumEncounterMode.OncePerPlayer) {
+        if (trainer.getEncounterMode().isTimedAccess() || trainer.getEncounterMode() == EnumEncounterMode.OncePerPlayer) {
             temp.getPersistentData().putString("clbase", trainer.getStringUUID());
             temp.getPersistentData().putString("clenc", trainer.getEncounterMode().name());
         }
@@ -195,37 +209,39 @@ public class BattleListeners {
         ArrayList<Pokemon> team = new ArrayList<>();
         if (main.contains(ShufflerTags.SHUFFLING_TRAINER.getId())) {
             String teamId = ShufflerHelper.findRandomTeamId(trainer);
-            if(teamId != null) team = ShufflerHelper.generateTeam(teamId);
+            if (teamId != null) team = ShufflerHelper.generateTeam(teamId);
         }
-        if(team.isEmpty()) team = GeneralHelper.cloneTrainerStorage(trainer, temp);
-        for(int i = 0; i < 6; i++) {
+        if (team.isEmpty()) team = GeneralHelper.cloneTrainerStorage(trainer, temp);
+        for (int i = 0; i < 6; i++) {
             temp.getPokemonStorage().set(i, null);
         }
         team.forEach(pokemon -> temp.getPokemonStorage().add(pokemon));
 
         //Spawn and Start Clone's Fight
-        if(selection.isEmpty()) return;
+        if (selection.isEmpty()) return;
         else {
             temp.setPos(player.getX(), player.getY(), player.getZ());
             player.getLevel().addFreshEntity(temp);
             temp.addEffect(new EffectInstance(Effects.INVISIBILITY, Integer.MAX_VALUE, 0, true, true));
-            if(main.contains(ShufflerTags.SHUFFLING_TRAINER.getId())) TeamSelectionRegistry.builder().members(new Entity[]{temp, player}).showOpponentTeam().battleRules(temp.battleRules).start();
+            if (main.contains(ShufflerTags.SHUFFLING_TRAINER.getId()))
+                TeamSelectionRegistry.builder().members(new Entity[]{temp, player}).showOpponentTeam().battleRules(temp.battleRules).start();
             else ShufflerHelper.startTrainerBattle(player, temp, selection);
         }
     }
+
     private void createCloneBase(NPCTrainer temp, NPCTrainer trainer, ServerPlayerEntity player) {
         temp.init(new BaseTrainer("TUtils Trainer"));
         temp.clearGreetings();
         temp.setPos(player.getX(), player.getY(), player.getZ());
-        if(trainer.getWinnings() != null) temp.updateDrops(trainer.getWinnings());
-        if(trainer.battleRules != null) temp.battleRules = trainer.battleRules;
-        if(trainer.getMegaItem() != null) temp.setMegaItem(trainer.getMegaItem());
+        if (trainer.getWinnings() != null) temp.updateDrops(trainer.getWinnings());
+        if (trainer.battleRules != null) temp.battleRules = trainer.battleRules;
+        if (trainer.getMegaItem() != null) temp.setMegaItem(trainer.getMegaItem());
         temp.winMoney = trainer.winMoney;
         temp.winMessage = trainer.winMessage;
         temp.loseMessage = trainer.loseMessage;
         temp.greeting = trainer.greeting;
         temp.setOldGenMode(trainer.getOldGen());
-        if(!trainer.getBossTier().equals(BossTierRegistry.NOT_BOSS)) temp.setBossTier(trainer.getBossTier());
+        if (!trainer.getBossTier().equals(BossTierRegistry.NOT_BOSS)) temp.setBossTier(trainer.getBossTier());
         temp.update(new SetTrainerData("Trainer", temp.greeting, temp.winMessage, temp.loseMessage, temp.winMoney, temp.getWinnings()));
     }
 }

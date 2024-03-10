@@ -43,6 +43,27 @@ public class TUtils {
                                         )
                         )
                         .then(
+                                Commands.literal("permissions")
+                                        .then(
+                                                Commands.literal("add")
+                                                        .then(Commands.argument("args", StringArgumentType.greedyString())
+                                                                .executes(cmd -> addPermission(cmd.getSource(), StringArgumentType.getString(cmd, "args")))
+                                                        )
+                                        )
+                                        .then(
+                                                Commands.literal("remove")
+                                                        .then(Commands.argument("args", StringArgumentType.greedyString())
+                                                                .executes(cmd -> removePermission(cmd.getSource(), StringArgumentType.getString(cmd, "args")))
+                                                        )
+                                        )
+                                        .then(Commands.literal("clear")
+                                                .executes(cmd -> clearPermissions(cmd.getSource()))
+                                        )
+                                        .then(Commands.literal("list")
+                                                .executes(cmd -> listPermissions(cmd.getSource()))
+                                        )
+                        )
+                        .then(
                                 Commands.literal("conddrops")
                                         .then(Commands.literal("add")
                                                 .then(Commands.argument("args", StringArgumentType.greedyString())
@@ -227,6 +248,10 @@ public class TUtils {
                 "- /tutils shuffler remove [team_id]: Removes the team id provided from the ids a trainer can shuffle through.\n\n" +
                 "- /tutils shuffler clear: Clears all the teams a trainer can shuffle through.\n\n" +
                 "- /tutils shuffler list: Lists all the team ids the trainer can shuffle through.\n\n" +
+                "- /tutils permissions add [permission_name]: Adds a permission required to battle a trainer.\n\n" +
+                "- /tutils permissions remove [permission_name]: Removes the provided permission from a trainer if they have it.\n\n" +
+                "- /tutils permissions list: Lists all the permissions a trainer has.\n\n" +
+                "- /tutils permissions clear: Clears all the permissions a trainer has.\n\n" +
                 "====== COMMAND TAGS ======\n\n" +
                 "- @PL: Get's the player's username.\n\n" +
                 "- @PCMD: Makes the player run the command.\n\n" +
@@ -479,6 +504,34 @@ public class TUtils {
         if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
         ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
         PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_SHUFFLE, null, 300));
+        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        return 0;
+    }
+    private int addPermission(CommandSource src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
+        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+        PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.ADD_PERMISSION, args, 600));
+        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        return 0;
+    }
+    private int removePermission(CommandSource src, String args) {
+        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
+        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+        PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.REMOVE_PERMISSION, args, 600));
+        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        return 0;
+    }
+    private int listPermissions(CommandSource src) {
+        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
+        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+        PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.LIST_PERMISSIONS, null, 600));
+        player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
+        return 0;
+    }
+    private int clearPermissions(CommandSource src) {
+        if(!(src.getEntity() instanceof ServerPlayerEntity)) return 1;
+        ServerPlayerEntity player = (ServerPlayerEntity) src.getEntity();
+        PlayerCommandsTickListener.pendingRequests.put(player.getUUID(), new InteractRequest(RequestTags.CLEAR_PERMISSIONS, null, 600));
         player.sendMessage(new StringTextComponent("[CloverTrainerUtils] All set! Right click a trainer to process your request!"), Util.NIL_UUID);
         return 0;
     }
