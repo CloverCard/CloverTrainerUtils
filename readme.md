@@ -166,6 +166,53 @@ In Pixelmon Reforged, there are many options for customizing trainers such as ba
   </tr>
 </table>
 
+<h4>Permissions</h4>
+
+
+
+<table>
+  <tr>
+   <td><strong>Function</strong>
+   </td>
+   <td><strong>Command</strong>
+   </td>
+   <td><strong>Description</strong>
+   </td>
+  </tr>
+  <tr>
+   <td>Add Permission
+   </td>
+   <td>/tutils permissions add [permission_tag]:
+   </td>
+   <td>Sets the tag required to access the trainer.
+   </td>
+  </tr>
+  <tr>
+   <td>Remove a Permission
+   </td>
+   <td>/tutils permissions remove [permission_tag]:
+   </td>
+   <td>Removes a permission from the trainer.
+   </td>
+  </tr>
+  <tr>
+   <td>View Permissions
+   </td>
+   <td>/tutils permissions list
+   </td>
+   <td>Displays the current tags.
+   </td>
+  </tr>
+  <tr>
+  <tr>
+   <td>Clear Permissions
+   </td>
+   <td>/tutils permissions clear
+   </td>
+   <td>Removes all tags on a trainer.
+   </td>
+  </tr>
+</table>
 
 <h4>Conditional Drops</h4>
 
