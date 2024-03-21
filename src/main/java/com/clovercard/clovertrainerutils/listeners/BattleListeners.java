@@ -199,6 +199,10 @@ public class BattleListeners {
             BattleRewardsHelper.setCondRewardsOnClone(temp);
         }
 
+        //Add NBT tag storing the original trainer location for other sidemods to use
+        String location = trainer.blockPosition().getX() + "," + trainer.blockPosition().getY() + "," + trainer.blockPosition().getZ();
+        tempMain.putString("OriginalTrainerLocation", location);
+
         //Handle Encounter Modes
         if (trainer.getEncounterMode().isTimedAccess() || trainer.getEncounterMode() == EnumEncounterMode.OncePerPlayer) {
             temp.getPersistentData().putString("clbase", trainer.getStringUUID());
