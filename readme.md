@@ -54,7 +54,7 @@ In Pixelmon Reforged, there are many options for customizing trainers such as ba
 
 
 <p>
-*Note: To use this mod, you need both Pixelmon Reforged (Version: 1.16.5-9.1.5) and at least Minecraft Forge (Version: 36.2.34).
+*Note: To use this mod, you need both the latest version of Pixelmon Reforged for MC 1.16.5 and at least Minecraft Forge (Version: 36.2.34).
 </p>
 <ol>
 
