@@ -15,6 +15,7 @@ public class ChatListener {
     public void onChat(NPCChatEvent event) {
         if(event.npc instanceof NPCFisherman) return;
         if(!(event.player instanceof ServerPlayerEntity)) return;
+        if(!(event.npc instanceof NPCChatting)) return;
         ServerPlayerEntity player = (ServerPlayerEntity) event.player;
         NPCChatting npc = (NPCChatting) event.npc;
         if(npc.getPersistentData().contains(TrainerUtilsTags.MAIN_TAG.getId())) {
